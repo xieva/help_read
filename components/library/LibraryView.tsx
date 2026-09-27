@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import type { Book, BookStatus } from "@/data/books";
 import type { Segment } from "@/lib/library";
+import ReadingShelf from "@/components/book/ReadingShelf";
 import BookCover from "@/components/book/BookCover";
 import BookMorph from "@/components/book/BookMorph";
 import ChapterMap from "@/components/book/ChapterMap";
@@ -199,34 +200,9 @@ function ReadingList({ items }: { items: LibraryItem[] }) {
   );
 }
 
-// 책장: 표지들이 선반 선 위에 서 있어요. 책이 많아져도 줄 단위로 가지런히 쌓입니다.
+// 같은 서가를 홈과 서재에서 사용합니다.
 function Shelf({ items, showReason = false }: { items: LibraryItem[]; showReason?: boolean }) {
-  return (
-    <div className="grid grid-cols-3 gap-y-10 [--cw:86px] sm:grid-cols-4 md:grid-cols-5 md:gap-y-14 md:[--cw:112px] lg:grid-cols-6">
-      {items.map(({ book, meta }) => (
-        <Link key={book.id} href={`/books/${book.id}`} className="group block px-2 md:px-3">
-          <div className="flex h-[calc(var(--cw)*1.72)] items-end justify-center">
-            <BookMorph id={book.id}>
-              <div
-                className="transition-transform duration-500 ease-[var(--ease-book)] group-hover:-translate-y-2 group-active:-translate-y-1"
-                style={{ width: `calc(var(--cw) * ${book.cover.size ?? 1})` }}
-              >
-                <BookCover book={book} className="book-lift w-full" />
-              </div>
-            </BookMorph>
-          </div>
-          <div className="-mx-2 h-px bg-ink/20 md:-mx-3" />
-          <div className="-mx-2 h-3 bg-gradient-to-b from-ink/[0.05] to-transparent md:-mx-3" />
-          <p className="mt-0.5 line-clamp-2 font-serif text-[13.5px] leading-snug md:text-[14.5px]">{book.title}</p>
-          <p className="mt-1 truncate text-[11.5px] text-ink-3">{book.author}</p>
-          <p className="mt-0.5 truncate text-[11.5px] text-ink-4">{meta}</p>
-          {showReason && book.addedReason && (
-            <p className="mt-2 hidden text-[12px] leading-relaxed text-ink-2 md:block">{book.addedReason}</p>
-          )}
-        </Link>
-      ))}
-    </div>
-  );
+  return <ReadingShelf books={items.map(({ book }) => book)} showReason={showReason} />;
 }
 
 function FinishedByYear({ items }: { items: LibraryItem[] }) {

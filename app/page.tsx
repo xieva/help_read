@@ -5,7 +5,7 @@
 import Link from "next/link";
 import BookCover from "@/components/book/BookCover";
 import BookMorph from "@/components/book/BookMorph";
-import BookSpine from "@/components/book/BookSpine";
+import ReadingShelf from "@/components/book/ReadingShelf";
 import ChapterMap from "@/components/book/ChapterMap";
 import HomeHero from "@/components/home/HomeHero";
 import { Arrow } from "@/components/ui/Buttons";
@@ -139,17 +139,7 @@ export default function HomePage() {
         <Section label="최근 다 읽은 책" aside={finishedThisYear > 0 ? `올해 ${finishedThisYear}권` : undefined}>
           <div className="md:grid md:grid-cols-9 md:items-end md:gap-12">
             <div className="md:col-span-5">
-              <div className="no-scrollbar -mx-[22px] overflow-x-auto md:mx-0">
-                <div className="flex min-w-max items-end gap-[3px] px-[22px] pt-6 md:px-0">
-                  {finished.slice(0, 8).map((b) => (
-                    <Link key={b.id} href={`/books/${b.id}`} className="spine-link" aria-label={b.title}>
-                      <BookSpine book={b} baseHeight={172} />
-                    </Link>
-                  ))}
-                </div>
-              </div>
-              <div className="h-px bg-ink/25" />
-              <div className="h-4 bg-gradient-to-b from-ink/[0.06] to-transparent" />
+              <ReadingShelf books={finished.slice(0, 8)} />
             </div>
 
             {quoted && (

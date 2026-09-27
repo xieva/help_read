@@ -22,7 +22,7 @@ export default function BookCover({ book, className = "", style }: Props) {
 
   return (
     <div
-      className={`cover @container aspect-[2/3] shrink-0 ${className}`}
+      className={`cover @container aspect-[1/1.38] shrink-0 ${className}`}
       style={{ backgroundColor: cover.bg, color: cover.ink, ...style }}
     >
       {book.coverImage ? (

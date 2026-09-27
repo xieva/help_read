@@ -210,7 +210,7 @@ body::before {
   기본은 책등이 아주 조금 보이게 돌아가 있고, 손을 올리면 정면으로 돌아옵니다.
 */
 .book3d {
-  --h: calc(var(--w) * 1.5);
+  --h: calc(var(--w) * 1.38);
   --ry: 18deg;
   width: var(--w);
   height: var(--h);
@@ -402,3 +402,103 @@ body::before {
     transition: none;
   }
 }
+
+/* Daylight bookcase. Future atmosphere presets can override these tokens. */
+.reading-shelf {
+  --shelf-wall: #e8e2d5;
+  --shelf-wood: #b6a18a;
+  --shelf-light: rgba(255, 253, 238, .7);
+  --shelf-shadow: rgba(57, 43, 28, .22);
+  position: relative;
+  isolation: isolate;
+  margin-top: 12px;
+  border-radius: 3px;
+  background: linear-gradient(115deg, var(--shelf-light), transparent 65%), var(--shelf-wall);
+  box-shadow: inset 0 2px 18px #47331d08;
+}
+.shelf-window { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: -1; }
+.shelf-window::before {
+  content: ""; position: absolute; top: -70px; right: -15%; width: 65%; height: 370px;
+  transform: skewX(-27deg); opacity: .6;
+  background: linear-gradient(90deg, transparent 46%, #a2958015 47% 49%, transparent 50%), linear-gradient(0deg, transparent 48%, #a2958015 49% 51%, transparent 52%), linear-gradient(90deg, transparent, #fffdf380);
+}
+.shelf-scroll { overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; scrollbar-color: #aa978055 transparent; padding-top: 28px; }
+.shelf-row {
+  display: flex; align-items: flex-end; gap: 9px; width: max-content; min-width: 100%;
+  padding: 44px 30px 0; height: 244px; position: relative;
+  border-bottom: 12px solid var(--shelf-wood);
+  background: linear-gradient(0deg, var(--shelf-shadow), transparent 28px);
+  box-shadow: 0 7px 12px -6px #4f382750, inset 0 -1px #fff9;
+}
+.shelf-slot {
+  display: block; position: relative; flex: 0 0 auto;
+  width: calc(var(--book-t) + 7px); height: var(--book-h);
+  perspective: 1000px; z-index: 1; outline-offset: 7px;
+  transition: width 620ms var(--ease-book); touch-action: manipulation;
+}
+.shelf-slot.is-displayed { width: calc(var(--book-w) + 12px); margin: 0 10px; }
+.shelf-slot.is-selected { width: calc(var(--book-w) + 24px); z-index: 5; }
+.shelf-slot:focus-visible { outline: 2px solid var(--color-ink); border-radius: 3px; }
+.shelf-object {
+  display: block; position: absolute; left: 50%; bottom: 0;
+  width: var(--book-w); height: var(--book-h); transform-style: preserve-3d;
+  transform: translateX(-50%) rotateZ(var(--lean)) rotateY(88deg);
+  transform-origin: center bottom;
+  transition: transform 700ms var(--ease-book);
+}
+.is-displayed .shelf-object { transform: translateX(-50%) rotateZ(var(--lean)) rotateY(18deg); }
+.is-selected .shelf-object { transform: translateX(-50%) translateY(-14px) translateZ(28px) rotateY(12deg); }
+.is-entering .shelf-object { transform: translateX(-50%) translateY(-28px) translateZ(120px) rotateY(0deg) scale(1.12); }
+.shelf-front, .shelf-back { position: absolute; inset: 0; backface-visibility: hidden; }
+.shelf-front { transform: translateZ(calc(var(--book-t) / 2)); box-shadow: 3px 10px 20px #35261424; }
+.shelf-front .cover { display: block; }
+.shelf-back { transform: rotateY(180deg) translateZ(calc(var(--book-t) / 2)); background: var(--book-bg); }
+.shelf-spine, .shelf-pages {
+  position: absolute; top: 0; left: calc(50% - var(--book-t) / 2); height: 100%; width: var(--book-t);
+  backface-visibility: hidden;
+}
+.shelf-spine {
+  display: flex; align-items: center; flex-direction: column; justify-content: space-between;
+  padding: 11px 4px; transform: rotateY(-90deg) translateZ(calc(var(--book-w) / 2));
+  color: var(--book-ink); background: linear-gradient(90deg,#0003,transparent 20%,#fff1 65%,#0002),var(--book-bg);
+  border-radius: 2px; box-shadow: inset 1px 0 #fff3, 3px 3px 5px #33200f30;
+}
+.shelf-spine-rule { width: 80%; height: 5px; border-block: 1px solid currentColor; opacity: .45; }
+.shelf-spine-title { writing-mode: vertical-rl; font-family: var(--font-serif); font-size: 12px; letter-spacing: .035em; max-height: 112px; overflow: hidden; }
+.shelf-spine-author { font-size: 7px; max-width: 100%; overflow: hidden; white-space: nowrap; opacity: .75; }
+.shelf-pages { transform: rotateY(90deg) translateZ(calc(var(--book-w) / 2 - 2px)); background: repeating-linear-gradient(90deg,#f4eddf 0 1px,#ded4c3 1px 2px); height: calc(100% - 4px); top: 2px; }
+.shelf-bookend { width: 20px; height: 85px; border-right: 5px solid #807769; border-bottom: 5px solid #807769; margin-left: 8px; border-radius: 0 0 3px; transform: skewX(-8deg); opacity: .7; }
+.shelf-caption { min-height: 85px; padding: 19px 24px 18px; display: flex; flex-direction: column; gap: 5px; color: var(--color-ink-3); font-size: 11px; background: var(--color-paper); }
+.shelf-caption-title { font-family: var(--font-serif); font-size: 16px; color: var(--color-ink); }
+.shelf-caption p { max-width: 460px; line-height: 1.7; padding-top: 5px; }
+@media (max-width: 600px) {
+  .shelf-row { padding-inline: 22px; gap: 8px; }
+  .shelf-caption { padding-inline: 4px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shelf-slot, .shelf-object { transition: none; }
+}
+
+/* Frosted decorative volumes fill only the unused shelf width. */
+.shelf-ghosts {
+  display: flex; align-items: flex-end; gap: 20px;
+  flex: 1 1 0; min-width: 0; height: 185px; overflow: hidden;
+  pointer-events: none; user-select: none;
+  mask-image: linear-gradient(90deg, #000 0%, #000 92%, transparent);
+}
+.ghost-group { display: flex; align-items: flex-end; gap: 4px; flex: 0 0 auto; padding: 5px 4px 0; }
+.ghost-book {
+  display: block; position: relative; width: var(--ghost-w); height: var(--ghost-h);
+  opacity: var(--ghost-alpha); transform: rotate(var(--ghost-lean)); transform-origin: bottom;
+  border: 1px solid #fffdf1c9; border-right-color: #7e827563; border-radius: 3px 4px 2px 2px;
+  background: linear-gradient(90deg, #84908560, #fcfcf3a8 19%, #d6dbd099 70%, #a1aa9e70);
+  box-shadow: inset 3px 0 3px #fff9, inset -3px 0 4px #5c655321, 3px 2px 5px #5c604026;
+}
+.ghost-book::before, .ghost-book::after { content: ""; position: absolute; left: 18%; right: 18%; height: 4px; border-block: 1px solid #7c877b70; }
+.ghost-book::before { top: 12px; }
+.ghost-book::after { bottom: 13px; }
+.ghost-book > span { position: absolute; width: 2px; height: 30%; left: 50%; top: 30%; background: #eef1e3b0; }
+.ghost-stack { flex-direction: column; gap: 3px; padding-bottom: 2px; align-items: center; }
+.ghost-stack .ghost-book { height: 24px; width: calc(var(--ghost-h) * .83); transform-origin: center; }
+.ghost-stack .ghost-book::before { inset: 5px 10px 5px 20%; height: auto; border: 0; background: repeating-linear-gradient(0deg, transparent 0 2px, #83917c45 2px 3px); }
+.ghost-stack .ghost-book::after, .ghost-stack .ghost-book > span { display: none; }
