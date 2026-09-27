@@ -1,103 +1,90 @@
 "use client";
-// "use client": 현재 주소를 알아야 해서 브라우저에서 동작하는 컴포넌트로 만듭니다.
+// 모바일: 아래쪽 탭 바 / 데스크톱: 위쪽 가로 메뉴
 
+import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const items = [
-  { href: "/", label: "오늘", icon: TodayIcon },
-  { href: "/library", label: "서재", icon: LibraryIcon },
-  { href: "/discover", label: "추천", icon: DiscoverIcon },
+  { href: "/", label: "오늘" },
+  { href: "/library", label: "서재" },
+  { href: "/discover", label: "발견" },
 ];
 
-// 지금 보고 있는 화면이 어떤 메뉴에 속하는지 판단
 function isActive(pathname: string, href: string) {
-  if (href === "/") return pathname === "/";
-  if (href === "/library") return pathname.startsWith("/library") || pathname.startsWith("/books");
-  return pathname.startsWith(href);
+  const path = pathname.replace(/\/$/, "") || "/";
+  if (href === "/") return path === "/";
+  if (href === "/library") return path.startsWith("/library") || path.startsWith("/books");
+  return path.startsWith(href);
 }
 
 export default function Nav() {
   const pathname = usePathname();
 
-  // "계속 읽기" 화면에서는 독서에 집중하도록 메뉴를 숨깁니다
-  // (웹 배포 주소는 끝에 "/"가 붙을 수 있어서 떼고 비교합니다)
+  // 독서 모드에서는 메뉴를 숨깁니다 (웹 배포 주소는 끝에 "/"가 붙을 수 있어요)
   if (pathname.replace(/\/$/, "").endsWith("/read")) return null;
 
   return (
     <>
-      {/* 위쪽: 앱 이름 + (데스크톱에서만) 메뉴 */}
-      <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 pt-[max(1.25rem,env(safe-area-inset-top))] md:px-10 md:pt-8">
-        <Link href="/" className="font-serif text-[17px] tracking-tight text-ink">
-          다시, 책
-        </Link>
-        <nav className="hidden gap-8 text-[14px] md:flex">
-          {items.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={
-                isActive(pathname, item.href)
-                  ? "text-ink underline decoration-accent/60 underline-offset-[6px]"
-                  : "text-muted transition-colors hover:text-ink"
-              }
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+      {/* 데스크톱 상단 */}
+      <header className="relative z-40 hidden md:block" style={{ viewTransitionName: "site-header" }}>
+        <div className="wrap flex h-20 items-center justify-between">
+          <Link href="/" className="font-serif text-[19px] tracking-[-0.01em] text-ink">
+            다시, 책
+          </Link>
+          <nav className="flex items-center gap-10 text-[14px]">
+            {items.map((item) => {
+              const active = isActive(pathname, item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`relative py-2 transition-colors ${active ? "text-ink" : "text-ink-3 hover:text-ink"}`}
+                >
+                  {item.label}
+                  {active && (
+                    <motion.span
+                      layoutId="nav-desktop"
+                      className="absolute inset-x-0 -bottom-0.5 h-px bg-ink"
+                      transition={{ type: "spring", damping: 30, stiffness: 380 }}
+                    />
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
       </header>
 
-      {/* 아래쪽 탭 바: 모바일에서만 보입니다 */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line/70 bg-paper pb-[env(safe-area-inset-bottom)] md:hidden">
-        <div className="mx-auto flex max-w-md justify-around">
+      {/* 모바일 하단 탭 바 */}
+      <nav
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-ink/[0.07] bg-paper/[0.97] pb-[env(safe-area-inset-bottom)] md:hidden"
+        style={{ viewTransitionName: "site-nav" }}
+      >
+        <div className="mx-auto grid max-w-md grid-cols-3">
           {items.map((item) => {
             const active = isActive(pathname, item.href);
-            const Icon = item.icon;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex w-24 flex-col items-center gap-1 pt-2.5 pb-2 text-[11px] transition-colors ${
-                  active ? "text-ink" : "text-muted"
+                className={`press relative flex h-[58px] flex-col items-center justify-center text-[13px] transition-colors ${
+                  active ? "text-ink" : "text-ink-3"
                 }`}
               >
-                <Icon />
-                {item.label}
+                {active && (
+                  <motion.span
+                    layoutId="nav-mobile"
+                    className="absolute top-[9px] h-[4px] w-[4px] rounded-full bg-accent"
+                    transition={{ type: "spring", damping: 30, stiffness: 400 }}
+                  />
+                )}
+                <span className={active ? "font-medium" : ""}>{item.label}</span>
               </Link>
             );
           })}
         </div>
       </nav>
     </>
-  );
-}
-
-// ── 아주 단순한 선 아이콘들 ─────────────────────────────────
-
-function TodayIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4">
-      <path d="M12 6.5c-2-1.4-4.8-2-8-1.8v13c3.2-.2 6 .4 8 1.8 2-1.4 4.8-2 8-1.8v-13c-3.2-.2-6 .4-8 1.8Z" />
-      <path d="M12 6.5v13" />
-    </svg>
-  );
-}
-
-function LibraryIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4">
-      <path d="M5 4.5v15M9 4.5v15M13.5 6l3.8 13.2" />
-      <path d="M3 19.5h18" />
-    </svg>
-  );
-}
-
-function DiscoverIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4">
-      <circle cx="12" cy="12" r="8" />
-      <path d="m14.8 9.2-1.6 4-4 1.6 1.6-4 4-1.6Z" />
-    </svg>
   );
 }

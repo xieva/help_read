@@ -1,76 +1,398 @@
 @import "tailwindcss";
 
 /*
-  디자인의 기본값(색상·글꼴)을 여기에서 정합니다.
-  예) --color-paper 를 정의하면 코드에서 bg-paper, text-paper 처럼 쓸 수 있어요.
+  ─────────────────────────────────────────────────────────────
+  디자인 시스템: "저녁의 독서실"
+  - 종이처럼 아주 약간 따뜻한 바탕, 짙은 차콜 글자
+  - 가죽 장정 같은 코냑 브라운 한 가지만 포인트로
+  - 책이 가장 중요한 오브젝트. 나머지는 여백과 타이포그래피로.
+  ─────────────────────────────────────────────────────────────
 */
 @theme {
-  --color-paper: #f5f0e6; /* 종이색 바탕 */
-  --color-paper-deep: #ece4d5; /* 조금 더 짙은 종이색 */
-  --color-ink: #2a2521; /* 본문 글자 (짙은 차콜) */
-  --color-ink-soft: #564c43; /* 부드러운 본문 */
-  --color-muted: #938676; /* 보조 설명 */
-  --color-line: #ddd3c2; /* 아주 옅은 선 */
-  --color-accent: #8a4b2a; /* 포인트 브라운 (아주 조금만 사용) */
-  --color-night: #1e1b18; /* 독서 화면의 어두운 배경 */
-  --color-night-ink: #ece3d2;
+  --color-paper: #f4efe7; /* 바탕 */
+  --color-paper-2: #ece5d9; /* 한 톤 깊은 종이 */
+  --color-paper-3: #e2d9ca; /* 가장 깊은 종이 */
+  --color-lamp: #fffaf1; /* 스탠드 불빛 */
+  --color-ink: #1e1a16; /* 본문 */
+  --color-ink-2: #4b433b; /* 부드러운 본문 */
+  --color-ink-3: #8a7f72; /* 보조 설명 */
+  --color-ink-4: #b3a999; /* 아주 옅은 글자 */
+  --color-rule: #dbd1c1; /* 선 */
+  --color-accent: #9b5a33; /* 코냑 브라운 */
+  --color-accent-soft: #c69a78;
+  --color-night: #16130f; /* 독서 모드 */
+  --color-night-2: #221d18;
+  --color-night-ink: #ede4d3;
 
-  --font-serif: var(--font-noto-serif-kr), "AppleMyungjo", "Nanum Myeongjo", serif;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard",
-    "Noto Sans KR", "Malgun Gothic", sans-serif;
+  /* 라틴 문자와 숫자는 Garamond, 한글은 Noto Serif KR 로 섞어서 씁니다 */
+  --font-serif: var(--font-garamond), var(--font-noto-serif-kr), "AppleMyungjo", serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR",
+    "Malgun Gothic", sans-serif;
+
+  --ease-out-soft: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-book: cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+html,
+body {
+  /* 스탠드 불빛처럼 화면 밖으로 번지는 요소 때문에 옆으로 밀리지 않게 (sticky 는 그대로 동작) */
+  overflow-x: clip;
 }
 
 html {
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
 }
 
 body {
   background-color: var(--color-paper);
   color: var(--color-ink);
-  word-break: keep-all; /* 한국어 단어가 중간에서 끊기지 않게 */
-  /* 아주 옅은 종이 질감 */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.27 0 0 0 0 0.18 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  word-break: keep-all;
 }
 
-/* 책 표지 그림자: 탁자 위에 놓인 책처럼 */
-.shadow-book {
-  box-shadow:
-    0 1px 1px rgba(42, 30, 18, 0.08),
-    0 10px 22px -8px rgba(42, 30, 18, 0.35);
+/* 아주 옅은 종이 결. 화면 전체에 고정되어 스크롤해도 움직이지 않아요 */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.55;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.26 0 0 0 0 0.16 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* 표지 뒤로 떨어지는 스탠드 불빛 같은 은은한 밝기 */
-.lamp-light {
-  background: radial-gradient(closest-side, rgba(255, 251, 243, 0.95), rgba(255, 251, 243, 0));
+::selection {
+  background: color-mix(in oklab, var(--color-accent) 22%, transparent);
 }
 
-/* 화면이 바뀔 때 아주 부드럽게 나타나는 움직임 */
-@keyframes page-enter {
-  /* transform(이동)을 쓰면 전체 화면을 덮는 독서 화면이 깨져서, 투명도만 바꿉니다 */
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
+/* ── 레이아웃 ─────────────────────────────────────────────── */
 
-.page-enter {
-  animation: page-enter 0.45s ease-out both;
+/* 화면 폭에 맞춰 좌우 여백을 잡아주는 기본 틀 */
+.wrap {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 22px;
 }
-
-/* 움직임을 줄이도록 설정한 사용자에게는 애니메이션을 끕니다 */
-@media (prefers-reduced-motion: reduce) {
-  .page-enter {
-    animation: none;
+@media (min-width: 768px) {
+  .wrap {
+    padding-inline: 48px;
   }
 }
+@media (min-width: 1200px) {
+  .wrap {
+    padding-inline: 64px;
+  }
+}
 
-/* 가로 스크롤 영역의 스크롤바 숨기기 */
+/* ── 타이포그래피 ─────────────────────────────────────────── */
+
+.eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--color-ink-3);
+}
+
+.numeral {
+  font-family: var(--font-serif);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.oldstyle {
+  font-family: var(--font-serif);
+  font-variant-numeric: oldstyle-nums proportional-nums;
+}
+
+/* ── 인터랙션 ─────────────────────────────────────────────── */
+
+/* 누르는 순간 살짝 눌리는 느낌 */
+.press {
+  transition:
+    transform 160ms var(--ease-out-soft),
+    opacity 160ms var(--ease-out-soft),
+    background-color 200ms ease;
+}
+.press:active {
+  transform: scale(0.975);
+}
+
+/* 밑줄이 왼쪽에서 자라나는 텍스트 링크 */
+.link-line {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 400ms var(--ease-out-soft);
+  padding-bottom: 2px;
+}
+.link-line:hover,
+.group:hover .link-line {
+  background-size: 100% 1px;
+}
+
 .no-scrollbar {
   scrollbar-width: none;
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/* ── 책 표지 (평면) ───────────────────────────────────────── */
+
+.cover {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.5px 3px 3px 1.5px;
+  isolation: isolate;
+}
+/* 인쇄된 종이의 결 */
+.cover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.25 0 0 0 0 0.2 0 0 0 0.18 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* 책등 쪽 접힘선과 빛 */
+.cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.28) 0%,
+      rgba(0, 0, 0, 0.06) 2.8%,
+      rgba(255, 255, 255, 0.16) 4%,
+      rgba(255, 255, 255, 0) 7%,
+      rgba(0, 0, 0, 0) 92%,
+      rgba(0, 0, 0, 0.06) 100%
+    ),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 38%);
+}
+
+/* 놓여 있는 책의 두께와 그림자 (작은 표지용) */
+.book-lift {
+  box-shadow:
+    1px 0 0 rgba(255, 255, 255, 0.25) inset,
+    0 1px 1px rgba(40, 28, 16, 0.12),
+    0 3px 6px -2px rgba(40, 28, 16, 0.18),
+    0 14px 24px -12px rgba(40, 28, 16, 0.35);
+}
+
+/* 오른쪽에 살짝 보이는 종이 면 */
+.book-pages {
+  box-shadow:
+    1px 0 0 #f6f1e8,
+    2px 0 0 #ddd4c5,
+    3px 0 0 #f3ede3,
+    4px 0 0 #d6ccbc,
+    0 1px 1px rgba(40, 28, 16, 0.12),
+    0 6px 10px -4px rgba(40, 28, 16, 0.22),
+    0 18px 28px -14px rgba(40, 28, 16, 0.4);
+}
+
+/* ── 책 오브젝트 (입체) ───────────────────────────────────── */
+/*
+  --w: 표지 너비, --t: 두께. 실제 책처럼 표지·책등·종이 면으로 이루어져 있어요.
+  기본은 책등이 아주 조금 보이게 돌아가 있고, 손을 올리면 정면으로 돌아옵니다.
+*/
+.book3d {
+  --h: calc(var(--w) * 1.5);
+  --ry: 18deg;
+  width: var(--w);
+  height: var(--h);
+  perspective: 1400px;
+  position: relative;
+}
+.book3d-body {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateY(var(--ry));
+  transition: transform 700ms var(--ease-book);
+}
+.book3d-front,
+.book3d-back {
+  position: absolute;
+  inset: 0;
+}
+.book3d-front {
+  transform: translateZ(calc(var(--t) / 2));
+}
+.book3d-back {
+  transform: rotateY(180deg) translateZ(calc(var(--t) / 2));
+  background: var(--spine);
+  border-radius: 3px;
+}
+.book3d-spine,
+.book3d-edge {
+  position: absolute;
+  top: 0;
+  width: var(--t);
+  height: 100%;
+  left: calc(50% - var(--t) / 2);
+}
+.book3d-spine {
+  transform: rotateY(-90deg) translateZ(calc(var(--w) / 2));
+  background: var(--spine);
+  box-shadow: inset -6px 0 10px -6px rgba(0, 0, 0, 0.35), inset 3px 0 6px -4px rgba(255, 255, 255, 0.2);
+}
+.book3d-edge {
+  transform: rotateY(90deg) translateZ(calc(var(--w) / 2 - 2px));
+  height: calc(100% - 4px);
+  top: 2px;
+  background: repeating-linear-gradient(90deg, #f3ede2 0 1px, #e3d9c9 1px 2px), #efe8dc;
+  box-shadow: inset 0 0 8px rgba(80, 60, 40, 0.18);
+}
+/* 책 아래 탁자에 닿는 그림자 */
+.book3d-shadow {
+  position: absolute;
+  left: 4%;
+  right: -6%;
+  bottom: -5%;
+  height: 12%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(40, 26, 14, 0.38), rgba(40, 26, 14, 0));
+  filter: blur(6px);
+  transition:
+    transform 700ms var(--ease-book),
+    opacity 700ms var(--ease-book);
+  z-index: -1;
+}
+.book3d-cast {
+  position: absolute;
+  inset: 6% -8% -2% 18%;
+  background: rgba(40, 26, 14, 0.2);
+  filter: blur(26px);
+  border-radius: 12px;
+  z-index: -1;
+  transition: transform 700ms var(--ease-book);
+}
+
+.book3d-interactive:hover .book3d-body,
+.book3d-interactive:focus-visible .book3d-body {
+  transform: rotateY(6deg) translateY(-6px);
+}
+.book3d-interactive:hover .book3d-shadow {
+  transform: scale(0.92);
+  opacity: 0.8;
+}
+.book3d-interactive:active .book3d-body {
+  transform: rotateY(4deg) translateY(-2px) scale(0.985);
+  transition-duration: 200ms;
+}
+
+/* 스탠드 불빛 */
+.lamp {
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 250, 240, 1) 0%,
+    rgba(255, 248, 236, 0.75) 38%,
+    rgba(255, 248, 236, 0) 100%
+  );
+}
+
+/* ── 책등 (선반에 꽂힌 책) ───────────────────────────────── */
+
+.spine {
+  position: relative;
+  border-radius: 2px 2px 1px 1px;
+  transition: transform 450ms var(--ease-book);
+  box-shadow:
+    inset 2px 0 3px -1px rgba(255, 255, 255, 0.18),
+    inset -3px 0 5px -2px rgba(0, 0, 0, 0.35),
+    0 1px 0 rgba(0, 0, 0, 0.1);
+}
+.spine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.12), rgba(255, 255, 255, 0.07) 40%, rgba(0, 0, 0, 0.14));
+  pointer-events: none;
+}
+.spine-link:hover .spine,
+.spine-link:focus-visible .spine {
+  transform: translateY(-10px);
+}
+.spine-link:active .spine {
+  transform: translateY(-6px);
+}
+
+/* ── 화면 전환 (View Transitions) ────────────────────────── */
+
+::view-transition {
+  pointer-events: none;
+}
+
+/* 페이지 전체는 짧고 부드럽게 겹쳐 바뀝니다 */
+::view-transition-old(root) {
+  animation: 180ms ease-in both vt-fade-out;
+}
+::view-transition-new(root) {
+  animation: 320ms var(--ease-out-soft) 60ms both vt-fade-in;
+}
+
+/* 책 표지는 누른 자리에서 다음 화면의 자리로 이어서 움직입니다 */
+::view-transition-group(.book-morph) {
+  animation-duration: 520ms;
+  animation-timing-function: var(--ease-book);
+  z-index: 50;
+}
+::view-transition-image-pair(.book-morph) {
+  isolation: auto;
+}
+::view-transition-old(.book-morph),
+::view-transition-new(.book-morph) {
+  animation-duration: 520ms;
+  mix-blend-mode: normal;
+  height: 100%;
+  object-fit: fill;
+}
+
+/* 메뉴는 전환 중에도 제자리에 */
+::view-transition-group(site-nav) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-nav) {
+  display: none;
+}
+::view-transition-new(site-nav) {
+  animation: none;
+}
+
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+  .book3d-body,
+  .spine {
+    transition: none;
+  }
 }

@@ -1,63 +1,54 @@
-// 내 서재 화면
-// 읽는 중인 책은 크게, 읽고 싶은 책과 다 읽은 책은 책장 위에 놓인 모습으로 보여줍니다.
+// 서재
+// 데이터는 여기(서버)에서 준비하고, 검색·필터 같은 움직이는 부분은 LibraryView 가 맡습니다.
 
-import Link from "next/link";
-import BookCover from "@/components/BookCover";
-import ProgressLine from "@/components/ProgressLine";
-import Shelf from "@/components/Shelf";
-import { formatRelativeDay, getAllBooks, getBooksByStatus, getProgress } from "@/lib/library";
+import { Suspense } from "react";
+import LibraryView, { type LibraryItem } from "@/components/library/LibraryView";
+import {
+  formatDate,
+  formatMonth,
+  formatRelativeDay,
+  getAllBooks,
+  getBooksByStatus,
+  getChapterAt,
+  getProgress,
+  getSegments,
+} from "@/lib/library";
 
 export default function LibraryPage() {
-  const reading = getBooksByStatus("reading");
-  const want = getBooksByStatus("want");
-  const finished = getBooksByStatus("finished");
+  const order = [...getBooksByStatus("reading"), ...getBooksByStatus("want"), ...getBooksByStatus("finished")];
+
+  const items: LibraryItem[] = order.map((book) => {
+    const chapter = getChapterAt(book, book.currentPage);
+    return {
+      book,
+      progress: getProgress(book),
+      segments: getSegments(book),
+      chapterLabel: chapter ? `${chapter.no}장 ${chapter.title}` : undefined,
+      year: book.finishedAt ? new Date(book.finishedAt).getFullYear() : undefined,
+      meta:
+        book.status === "reading"
+          ? formatRelativeDay(book.lastReadAt)
+          : book.status === "finished"
+            ? formatMonth(book.finishedAt).replace(/^\d+년 /, "") + " 읽음"
+            : `${formatDate(book.addedAt)} 담음`,
+    };
+  });
+
+  const thisYear = new Date().getFullYear();
+  const finishedThisYear = items.filter((i) => i.book.status === "finished" && i.year === thisYear).length;
 
   return (
-    <div>
-      <header className="pt-8 md:pt-16">
-        <h1 className="font-serif text-[28px] font-medium md:text-[34px]">서재</h1>
-        <p className="mt-2 text-[14px] text-muted">
-          책 {getAllBooks().length}권 · 지금 {reading.length}권을 읽고 있어요
+    <div className="wrap pt-[max(24px,env(safe-area-inset-top))] md:pt-10">
+      <header>
+        <h1 className="font-serif text-[40px] leading-none font-medium tracking-[-0.02em] md:text-[64px]">서재</h1>
+        <p className="mt-4 text-[14px] text-ink-3">
+          <span className="numeral text-ink-2">{getAllBooks().length}</span>권의 책 · 올해{" "}
+          <span className="numeral text-ink-2">{finishedThisYear}</span>권을 끝까지 읽었어요
         </p>
       </header>
-
-      {/* 읽는 중 */}
-      <section className="mt-12">
-        <h2 className="text-[13px] text-muted">읽는 중</h2>
-        <div className="mt-6 grid gap-10 md:grid-cols-2 md:gap-12">
-          {reading.map((book) => (
-            <Link key={book.id} href={`/books/${book.id}`} className="group flex items-end gap-6">
-              <BookCover
-                title={book.title}
-                author={book.author}
-                cover={book.cover}
-                coverImage={book.coverImage}
-                className="w-28 transition-transform duration-300 group-hover:-translate-y-1 md:w-32"
-              />
-              <div className="min-w-0 flex-1 pb-1">
-                <p className="font-serif text-[20px] leading-snug group-hover:text-accent">{book.title}</p>
-                <p className="mt-1 text-[14px] text-ink-soft">{book.author}</p>
-                <ProgressLine value={getProgress(book)} className="mt-5" />
-                <p className="mt-2 text-[13px] text-muted tabular-nums">
-                  {book.currentPage} / {book.totalPages}쪽 · {formatRelativeDay(book.lastReadAt)}
-                </p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* 읽고 싶은 책 */}
-      <section className="mt-20">
-        <h2 className="text-[13px] text-muted">읽고 싶은 책</h2>
-        <Shelf books={want} />
-      </section>
-
-      {/* 다 읽은 책 */}
-      <section className="mt-16">
-        <h2 className="text-[13px] text-muted">다 읽은 책</h2>
-        <Shelf books={finished} />
-      </section>
+      <Suspense>
+        <LibraryView items={items} />
+      </Suspense>
     </div>
   );
 }
