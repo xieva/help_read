@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+/*
+  디자인의 기본값(색상·글꼴)을 여기에서 정합니다.
+  예) --color-paper 를 정의하면 코드에서 bg-paper, text-paper 처럼 쓸 수 있어요.
+*/
+@theme {
+  --color-paper: #f5f0e6; /* 종이색 바탕 */
+  --color-paper-deep: #ece4d5; /* 조금 더 짙은 종이색 */
+  --color-ink: #2a2521; /* 본문 글자 (짙은 차콜) */
+  --color-ink-soft: #564c43; /* 부드러운 본문 */
+  --color-muted: #938676; /* 보조 설명 */
+  --color-line: #ddd3c2; /* 아주 옅은 선 */
+  --color-accent: #8a4b2a; /* 포인트 브라운 (아주 조금만 사용) */
+  --color-night: #1e1b18; /* 독서 화면의 어두운 배경 */
+  --color-night-ink: #ece3d2;
+
+  --font-serif: var(--font-noto-serif-kr), "AppleMyungjo", "Nanum Myeongjo", serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard",
+    "Noto Sans KR", "Malgun Gothic", sans-serif;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  word-break: keep-all; /* 한국어 단어가 중간에서 끊기지 않게 */
+  /* 아주 옅은 종이 질감 */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.27 0 0 0 0 0.18 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* 책 표지 그림자: 탁자 위에 놓인 책처럼 */
+.shadow-book {
+  box-shadow:
+    0 1px 1px rgba(42, 30, 18, 0.08),
+    0 10px 22px -8px rgba(42, 30, 18, 0.35);
+}
+
+/* 표지 뒤로 떨어지는 스탠드 불빛 같은 은은한 밝기 */
+.lamp-light {
+  background: radial-gradient(closest-side, rgba(255, 251, 243, 0.95), rgba(255, 251, 243, 0));
+}
+
+/* 화면이 바뀔 때 아주 부드럽게 나타나는 움직임 */
+@keyframes page-enter {
+  /* transform(이동)을 쓰면 전체 화면을 덮는 독서 화면이 깨져서, 투명도만 바꿉니다 */
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.page-enter {
+  animation: page-enter 0.45s ease-out both;
+}
+
+/* 움직임을 줄이도록 설정한 사용자에게는 애니메이션을 끕니다 */
+@media (prefers-reduced-motion: reduce) {
+  .page-enter {
+    animation: none;
+  }
+}
+
+/* 가로 스크롤 영역의 스크롤바 숨기기 */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
