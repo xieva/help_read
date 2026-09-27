@@ -22,6 +22,18 @@ npm run dev
 > 아이폰에서 보려면: 컴퓨터와 아이폰을 같은 와이파이에 연결하고, `npm run dev` 실행 시 터미널에 표시되는
 > `Network: http://192.168.x.x:3000` 주소를 아이폰 사파리에서 엽니다.
 
+## 웹에서 보기 (GitHub Pages)
+
+주소: **https://xieva.github.io/help_read/**
+
+코드를 GitHub에 올리면(push) 약 1~2분 뒤 위 주소에 자동으로 반영됩니다.
+배포 설정은 `.github/workflows/deploy.yml` 에 있어요. 진행 상황은 GitHub 저장소의 **Actions** 탭에서 볼 수 있습니다.
+
+처음 한 번만 해야 하는 설정:
+1. GitHub 저장소 → **Settings** → 왼쪽 메뉴 **Pages**
+2. **Build and deployment** → Source: **Deploy from a branch**
+3. Branch: **gh-pages** / **/(root)** 선택 → **Save**
+
 ## 화면
 
 | 주소 | 화면 |

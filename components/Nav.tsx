@@ -21,7 +21,8 @@ export default function Nav() {
   const pathname = usePathname();
 
   // "계속 읽기" 화면에서는 독서에 집중하도록 메뉴를 숨깁니다
-  if (pathname.endsWith("/read")) return null;
+  // (웹 배포 주소는 끝에 "/"가 붙을 수 있어서 떼고 비교합니다)
+  if (pathname.replace(/\/$/, "").endsWith("/read")) return null;
 
   return (
     <>
