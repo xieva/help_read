@@ -33,6 +33,12 @@
   --ease-book: cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
+:root {
+  /* 글꼴 이름 (app/layout.tsx 에서 Google Fonts 로 불러와요) */
+  --font-garamond: "EB Garamond";
+  --font-noto-serif-kr: "Noto Serif KR";
+}
+
 html,
 body {
   /* 스탠드 불빛처럼 화면 밖으로 번지는 요소 때문에 옆으로 밀리지 않게 (sticky 는 그대로 동작) */
