@@ -35,17 +35,21 @@ export default function AccountView() {
                   on ? "border-accent" : "border-rule hover:border-ink-4"
                 }`}
               >
-                {/* 작은 미리보기: 바탕 위에 조명 받은 책장 한 칸 */}
+                {/* 작은 미리보기: 그 테마의 방에 놓인 원목 책장 한 칸 */}
                 <span className="relative block h-16 overflow-hidden rounded-[6px]" style={{ background: t.swatch[0] }} aria-hidden>
                   <span
-                    className="absolute inset-x-3 top-2 bottom-3 rounded-[2px]"
+                    className="absolute inset-x-3 top-2 bottom-2 rounded-[2px]"
+                    style={{ background: `var(--wood-v), ${t.swatch[3]}`, boxShadow: "0 4px 8px -3px rgb(0 0 0 / .5)" }}
+                  />
+                  <span
+                    className="absolute inset-x-[18px] top-[13px] bottom-[14px]"
                     style={{
-                      background: `radial-gradient(ellipse 60% 90% at 50% 0%, ${t.swatch[1]}55, transparent 75%), color-mix(in oklab, ${t.swatch[0]} 70%, black)`,
+                      background: `radial-gradient(ellipse 60% 90% at 50% 0%, ${t.swatch[1]}66, transparent 75%), color-mix(in oklab, ${t.swatch[3]} 45%, black)`,
                     }}
                   />
-                  <span className="absolute inset-x-3 bottom-3 h-[3px]" style={{ background: t.swatch[1], opacity: 0.6 }} />
-                  <span className="absolute bottom-[15px] left-6 flex items-end gap-[2px]">
-                    {[26, 32, 22, 29, 24].map((h, i) => (
+                  <span className="absolute inset-x-3 bottom-[10px] h-[4px]" style={{ background: `var(--wood-h), ${t.swatch[3]}`, filter: "brightness(1.15)" }} />
+                  <span className="absolute bottom-[14px] left-[22px] flex items-end gap-[2px]">
+                    {[24, 30, 21, 27, 23].map((h, i) => (
                       <span
                         key={i}
                         className="block w-[5px] rounded-[1px]"

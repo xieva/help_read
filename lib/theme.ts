@@ -6,11 +6,12 @@
 
 export type ThemeId = "night" | "paper" | "forest" | "dawn";
 
-export const THEMES: { id: ThemeId; name: string; note: string; swatch: [string, string, string] }[] = [
-  { id: "night", name: "서점의 밤", note: "조명 아래 철제 책장", swatch: ["#1c201e", "#d49a62", "#ece6da"] },
-  { id: "paper", name: "종이", note: "밝은 종이와 월넛 책장", swatch: ["#f4efe7", "#9b5a33", "#1e1a16"] },
-  { id: "forest", name: "숲속 서재", note: "짙은 초록과 원목", swatch: ["#17201b", "#b7c48f", "#e4eadc"] },
-  { id: "dawn", name: "새벽", note: "푸른 새벽빛과 슬레이트", swatch: ["#181c24", "#9fb4d8", "#e3e7ef"] },
+// swatch: [바탕, 포인트(조명), 글자, 책장 나무]
+export const THEMES: { id: ThemeId; name: string; note: string; swatch: [string, string, string, string] }[] = [
+  { id: "night", name: "서점의 밤", note: "스탠드 불빛과 월넛 책장", swatch: ["#1b1511", "#dba662", "#f2e9da", "#5d3c25"] },
+  { id: "paper", name: "종이", note: "크림색 종이와 오크 책장", swatch: ["#f3efe8", "#9b5a33", "#1d2128", "#93643b"] },
+  { id: "forest", name: "숲속 서재", note: "짙은 초록과 체리 원목", swatch: ["#151d18", "#cdb97e", "#e6ecde", "#6b4430"] },
+  { id: "dawn", name: "새벽", note: "푸른 새벽빛과 물푸레나무", swatch: ["#171b23", "#b4c4e2", "#e4e8ef", "#6c645a"] },
 ];
 
 export const DEFAULT_THEME: ThemeId = "night";

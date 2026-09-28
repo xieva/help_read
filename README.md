@@ -66,11 +66,18 @@ npm run dev
 
 ## 서재 · 책 상세 · 테마
 
-- **서재** (편집숍 서가): 카테고리 하나 = 책장 하나, 좌우로 넘겨요. 책을 한 번 누르면 옆 책들이 비켜나며 표지 쪽으로 돌아 나오고, 한 번 더 누르면 열려요.
+- **서재** (원목 서가): 카테고리 하나 = 책장 하나, 좌우로 넘겨요. 책을 누르면 꺼내져 앞면과 정보 카드가 나오고, 다시 누르면 꽂혀요.
+  내 책은 위 선반부터 빽빽하게 꽂고, 남는 자리는 흐릿한 **진열용 책**·북엔드·눕힌 책·화분으로 채워요 (누를 수 없는 장식).
+  로그인하면 마지막 책 옆의 **점선 빈자리(+)** 를 눌러 바로 책을 추가할 수 있어요.
   `components/book/BookstoreShelf.tsx`, 스타일은 `app/bookstore.css`.
+- **나뭇결**: `app/wood.css` 에 SVG 노이즈로 만든 결(`--wood-h` 가로, `--wood-v` 세로)이 있고, 나무 색은 테마마다 `app/themes.css` 의 `--case-*` 예요.
+  책장·서랍·책상·진열대·탭 바 모서리가 모두 같은 결을 써요.
 - **책 상세**: 책을 밀면 돌아가고, 누르면 종이가 끝까지 넘어가 **뒷면**이 나와요. 위로 나온 **책갈피**를 누르면 읽던 쪽이 펼쳐져요.
-  화면 왼쪽 가장자리의 책갈피를 오른쪽으로 당기면 **책 설정** 서랍이 나와요. 여기서 책갈피 무늬(밤하늘·잔디·바다·노을·벚꽃·눈)를 책마다 고를 수 있고, 설정은 `components/book/BookSettings.tsx`에 항목을 추가해 늘려요.
-  `components/book/BookViewer.tsx`, `components/book/Bookmark.tsx`, `components/ui/PullDrawer.tsx`.
+  책 왼쪽에 가로로 꽂힌 **설정 책갈피**를 누르거나 잡아당기면 **나무 서랍(책 설정)** 이 나와요. 여기서 책갈피 무늬(밤하늘·잔디·바다·노을·벚꽃·눈)를 책마다 고르고,
+  설정은 `components/book/BookSettings.tsx` 에 `<Section>` 을 추가해 늘려요. `components/book/BookViewer.tsx`, `components/book/Bookmark.tsx`, `components/ui/PullDrawer.tsx`.
+- **오늘 어디까지**: 내 책 상세·홈·읽기 모드에서 읽은 쪽을 −/+ 와 +10/+20/+30/끝까지로 바로 기록하고, 남은 쪽수를 보여줘요. `components/workspace/QuickLog.tsx`.
+  **기록 복사**를 누르면 제목·저자·쪽·날짜·메모가 복사돼 메모 앱에 붙여 넣을 수 있어요.
 - **앞·뒤 표지 이미지**: 책 데이터의 `coverImage`(앞), `coverBackImage`(뒤)에 이미지 주소를 넣으면 그림 대신 이미지가 보여요.
-- **테마**: 설정에서 서점의 밤(기본)·종이·숲속 서재·새벽 중에 고를 수 있어요. 색은 `app/themes.css`, 목록은 `lib/theme.ts`.
-- 브랜드 이름은 `lib/brand.ts` 에서 한 번에 바꿔요. 앱 아이콘(책갈피 + r)은 `app/icon.svg`, `app/apple-icon.png`, `components/brand/BrandMark.tsx`.
+- **테마**: 설정에서 서점의 밤(기본, 월넛)·종이(크림+오크)·숲속 서재(체리)·새벽(물푸레나무) 중에 고를 수 있어요. 색은 `app/themes.css`, 목록은 `lib/theme.ts`.
+- 브랜드 이름은 `lib/brand.ts` 에서 한 번에 바꿔요. 로고(책갈피가 r 로 접힌 모양, 크림 `#f3efe8` + 잉크 `#1d2128`)는
+  `app/icon.svg`, `app/apple-icon.png`, `components/brand/BrandMark.tsx`.

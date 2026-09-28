@@ -32,6 +32,7 @@ type Props = {
   bookmark?: BookmarkId; // 책갈피 무늬. 읽는 중인 책에만 보여요
   morphId?: string; // 서재에서 꺼낸 책이 이 자리로 이어지게 (화면 전환)
   className?: string; // 크기: "[--w:164px] md:[--w:220px]"
+  tab?: React.ReactNode; // 책 왼쪽에 가로로 꽂아 둘 것 (설정 책갈피)
 };
 
 const LEAVES = 18; // 넘어가는 종이 장 수
@@ -40,7 +41,7 @@ const STEP = 0.045; // 장과 장 사이 시간 간격 (초)
 const SHEET = 0.5; // 종이 한 장이 넘어가는 시간
 const COVER = 0.75; // 표지가 넘어가는 시간
 
-export default function BookViewer({ book, bookmark, morphId, className = "" }: Props) {
+export default function BookViewer({ book, bookmark, morphId, className = "", tab }: Props) {
   const reduce = useReducedMotion();
   const ry = useMotionValue(REST);
   const rx = useMotionValue(0);
@@ -208,8 +209,13 @@ export default function BookViewer({ book, bookmark, morphId, className = "" }: 
   );
 
   return (
-    <div className={`bv ${className}`}>
-      {morphId ? <BookMorph id={morphId}>{stageEl()}</BookMorph> : stageEl()}
+    <div className={`bv ${className}`} data-mode={mode}>
+      <div className="bv-stage-wrap">
+        {/* 책이 놓인 책상 */}
+        <div aria-hidden className="desk bv-desk" />
+        {tab && <div className="bv-tab">{tab}</div>}
+        {morphId ? <BookMorph id={morphId}>{stageEl()}</BookMorph> : stageEl()}
+      </div>
       <p className="bv-hint">{hint}</p>
       <div className="bv-controls" role="group" aria-label="책 보기">
         <button type="button" aria-pressed={mode === "front"} onClick={() => go("front")}>

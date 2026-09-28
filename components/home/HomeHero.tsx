@@ -62,6 +62,8 @@ export default function HomeHero({ book, segments, chapterLabel, returnLine, res
             className="lamp pointer-events-none absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 md:h-[900px] md:w-[900px]"
             style={{ opacity: lamp }}
           />
+          {/* 책이 놓인 책상 */}
+          <div aria-hidden className="desk absolute inset-x-[-30%] bottom-[-4%] h-[52%] md:inset-x-[-10%] md:bottom-[8%] md:h-[40%]" />
           <motion.div style={{ y, scale }}>
             <Link href={`/books/${book.id}`} aria-label={`${book.title} 자세히 보기`} className="block">
               <BookMorph id={book.id}>

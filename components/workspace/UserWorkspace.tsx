@@ -19,12 +19,39 @@ import ReadingTimer from "@/components/detail/ReadingTimer";
 import { getCatalogBook, searchCatalog, type CatalogBook } from "@/lib/catalog";
 import DateLine from "@/components/home/DateLine";
 import ShelfToolbar from "@/components/library/ShelfToolbar";
+import QuickLog from "./QuickLog";
 import { useWorkspace } from "./WorkspaceProvider";
 
 const statuses: Record<BookStatus, string> = { reading: "읽는 중", want: "읽고 싶은", finished: "다 읽은" };
 
 const toShelf = (b: PersonalBook): ShelfBook => ({ ...b, href: `/book?id=${encodeURIComponent(b.id)}`, readHref: `/book?id=${encodeURIComponent(b.id)}&read=1` });
 const progress = (b: PersonalBook) => (b.totalPages ? Math.round((b.currentPage / b.totalPages) * 100) : 0);
+
+// 내 기록을 다른 곳(메모 앱, 메신저)에 붙여 넣을 수 있게: 제목 · 저자 · 쪽 · 날짜 · 메모
+function recordText(b: PersonalBook) {
+  const date = new Intl.DateTimeFormat("ko-KR", { dateStyle: "medium", timeZone: "Asia/Seoul" }).format(new Date());
+  const lines = [`『${b.title}』 ${b.author}`, `${b.currentPage} / ${b.totalPages}쪽 · ${date}`];
+  if (b.note.trim()) lines.push("", b.note.trim());
+  return lines.join("\n");
+}
+async function copyText(text: string) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    // 보안 연결(https)이 아니면 clipboard 가 막혀 있어서, 옛 방식으로 한 번 더 시도해요
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.select();
+    const ok = document.execCommand("copy");
+    area.remove();
+    return ok;
+  }
+}
 
 export default function UserWorkspace({ section }: { section: string }) {
   const { user } = useAuth();
@@ -122,7 +149,7 @@ export default function UserWorkspace({ section }: { section: string }) {
       <Link href={`/book?id=${encodeURIComponent(b.id)}`} className="absolute top-8 left-6 text-sm">← 책으로</Link>
       <p className="text-sm text-night-ink/60">{b.title}</p><h1 className="mt-6 font-serif text-4xl">{Math.min(b.totalPages, Math.max(1, b.currentPage))}쪽부터.</h1>
       <p className="my-8 text-sm text-night-ink/60">가지고 있는 책을 펼치고, 읽는 데 집중해 보세요.</p><ReadingTimer />
-      <Link href={`/library?book=${encodeURIComponent(b.id)}`} className="mt-12 rounded border border-night-ink/30 px-6 py-3 text-sm">읽은 쪽 기록하기</Link>
+      <QuickLog book={b} tone="night" className="mt-12 w-full" />
     </div>;
     return (
       <div className="wrap pt-4 pb-16 md:pt-2">
@@ -146,12 +173,13 @@ export default function UserWorkspace({ section }: { section: string }) {
                 <span>
                   <span className="numeral text-ink-2">{b.currentPage}</span> / <span className="numeral">{b.totalPages}</span>쪽
                 </span>
-                <span className="numeral">{progress(b)}%</span>
+                <span>{b.currentPage >= b.totalPages ? "다 읽었어요" : <>남은 <span className="numeral text-ink-2">{b.totalPages - b.currentPage}</span>쪽</>}</span>
               </div>
               <div className="mt-2 h-[3px] bg-ink/10">
                 <div className="h-full bg-accent" style={{ width: `${progress(b)}%` }} />
               </div>
             </div>
+            {b.status !== "finished" && <QuickLog key={b.id} book={b} onFinished={setNotice} className="mt-6" />}
             {b.note && (
               <div className="mt-8 max-w-md">
                 <p className="eyebrow">나의 메모</p>
@@ -163,8 +191,14 @@ export default function UserWorkspace({ section }: { section: string }) {
               <button className="reader-button press" onClick={() => setEditing(true)}>
                 기록 수정
               </button>
-              <Link href="/library" className="reader-button secondary press">
-                서재로
+              <button
+                className="reader-button secondary press"
+                onClick={async () => setNotice((await copyText(recordText(b))) ? "기록을 복사했어요. 메모 앱에 붙여 넣을 수 있어요." : "복사하지 못했어요.")}
+              >
+                기록 복사
+              </button>
+              <Link href={`/book?id=${encodeURIComponent(b.id)}&read=1`} className="reader-button secondary press">
+                읽기 모드
               </Link>
             </div>
           </div>
@@ -248,19 +282,20 @@ export default function UserWorkspace({ section }: { section: string }) {
                 <p className="mt-1 text-[14px] text-ink-2">{current.author}</p>
                 <p className="mt-3 text-[13px] text-ink-3">
                   <span className="numeral text-ink-2">{current.currentPage}</span> /{" "}
-                  <span className="numeral">{current.totalPages}</span>쪽 · <span className="numeral">{progress(current)}</span>%
+                  <span className="numeral">{current.totalPages}</span>쪽 · 남은 <span className="numeral">{current.totalPages - current.currentPage}</span>쪽
                 </p>
                 <div className="mt-5 flex flex-wrap gap-3">
-                  <Link href={toShelf(current).href} className="reader-button press">
-                    책 펼쳐보기
+                  <Link href={`${toShelf(current).href}&read=1`} className="reader-button press">
+                    이어 읽기
                   </Link>
-                  <Link href={`/library?book=${encodeURIComponent(current.id)}`} className="reader-button secondary press">
-                    기록하기
+                  <Link href={toShelf(current).href} className="reader-button secondary press">
+                    책 펼쳐보기
                   </Link>
                 </div>
               </div>
             </section>
           )}
+          {current && <QuickLog key={current.id} book={current} onFinished={setNotice} className="mt-8" />}
           <section className="mt-14">
             <div className="mb-4 flex items-baseline justify-between">
               <h2 className="text-[17px] font-medium">내 책장</h2>

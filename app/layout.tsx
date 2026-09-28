@@ -9,6 +9,7 @@ import Experience from "@/components/workspace/Experience";
 import Nav from "@/components/Nav";
 import "./globals.css";
 import "./themes.css";
+import "./wood.css";
 import "./bookstore.css";
 import "./catalog.css";
 
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1c201e",
+  themeColor: "#1b1511",
   viewportFit: "cover",
 };
 

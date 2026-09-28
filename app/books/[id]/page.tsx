@@ -119,7 +119,7 @@ export default async function BookPage({ params }: { params: Promise<{ id: strin
                     </p>
                     <ChapterMap segments={segments} current={book.currentPage} className="mt-7" />
                     <p className="mt-3 text-right text-[12px] text-ink-3">
-                      <span className="numeral">{getProgress(book)}</span>% 지나옴
+                      남은 <span className="numeral text-ink-2">{book.totalPages - book.currentPage}</span>쪽 · <span className="numeral">{getProgress(book)}</span>%
                     </p>
 
                     <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-8 sm:gap-y-3">

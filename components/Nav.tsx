@@ -57,7 +57,7 @@ export default function Nav() {
                   {active && (
                     <motion.span
                       layoutId="nav-desktop"
-                      className="absolute inset-x-0 -bottom-0.5 h-px bg-ink"
+                      className="nav-ribbon absolute -top-[22px]"
                       transition={{ type: "spring", damping: 30, stiffness: 380 }}
                     />
                   )}
@@ -110,7 +110,7 @@ export default function Nav() {
 
       {/* 모바일 하단 탭 바 */}
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-ink/[0.07] bg-paper pb-[env(safe-area-inset-bottom)] md:hidden"
+        className="tabbar fixed inset-x-0 bottom-0 z-40 pb-[env(safe-area-inset-bottom)] md:hidden"
         style={{ viewTransitionName: "site-nav" }}
       >
         <div className="mx-auto grid max-w-md grid-cols-4">
@@ -127,7 +127,7 @@ export default function Nav() {
                 {active && (
                   <motion.span
                     layoutId="nav-mobile"
-                    className="absolute top-[9px] h-[4px] w-[4px] rounded-full bg-accent"
+                    className="nav-ribbon absolute top-0"
                     transition={{ type: "spring", damping: 30, stiffness: 400 }}
                   />
                 )}

@@ -3,111 +3,112 @@
   테마 색
   html 에 data-theme="night" 처럼 붙으면 그 테마의 색으로 바뀌어요.
   - 화면 색: --color-paper(바탕), --color-ink(글자), --color-accent(포인트) …
-  - 책장 색: --case-* (책장 판), --light (선반 조명 색, "R G B"), --light-a (조명 세기)
+  - 책장 나무: --case-* (나뭇결은 app/wood.css, 여기서는 나무의 색만)
+      --case-back   뒤판 (책 뒤로 보이는 판, 가장 어두워요)
+      --case-wood   옆판 · 윗판 · 받침
+      --case-board  선반 판
+      --case-hi     빛 받는 모서리
+  - 선반 조명: --light ("R G B"), --light-a (세기)
   - 스탠드 불빛: --lamp ("R G B"), --lamp-a (세기)
-  "종이" 테마는 globals.css 의 기본값을 그대로 써요.
+  "종이" 테마는 globals.css 의 기본값(로고의 크림 + 잉크)을 그대로 써요.
   ─────────────────────────────────────────────────────────────
 */
 
 :root {
-  --lamp: 255 250 240;
+  --lamp: 255 244 226;
   --lamp-a: 1;
-  /* 종이 테마의 책장: 월넛 */
-  --case-back: #2a2019;
-  --case-back-2: #261d16;
-  --case-post: #3d2e23;
-  --case-post-hi: #5a4535;
-  --case-board-top: #6e5341;
-  --case-board-front: #3f2f24;
-  --case-crown: #33271e;
-  --plate-bg: linear-gradient(#d4b47a, #a8844b);
+  /* 종이 테마의 책장: 밝은 오크 */
+  --case-back: #5a3c25;
+  --case-wood: #93643b;
+  --case-board: #a8733f;
+  --case-hi: #d3a06a;
+  --case-shade: 40 22 10;
+  --plate-bg: linear-gradient(#e2c68c, #b38d4f);
+  --plate-ink: #2b2015;
+  --light: 255 214 150;
+  --light-a: 0.38;
+  --room: #efe8dc; /* 책장 뒤 벽 */
+}
+
+/* 서점의 밤 (기본): 따뜻한 월넛 책장과 스탠드 불빛 */
+html[data-theme="night"] {
+  --color-paper: #1b1511;
+  --color-paper-2: #241c16;
+  --color-paper-3: #2e241c;
+  --color-lamp: #2b2119;
+  --color-ink: #f2e9da;
+  --color-ink-2: #d0c2ae;
+  --color-ink-3: #9e8e7b;
+  --color-ink-4: #6e6052;
+  --color-rule: #3a2e25;
+  --color-accent: #dba662;
+  --color-accent-soft: #b98650;
+  --lamp: 255 186 110;
+  --lamp-a: 0.16;
+  --case-back: #2b1c12;
+  --case-wood: #5d3c25;
+  --case-board: #6e4829;
+  --case-hi: #a8764b;
+  --case-shade: 12 6 2;
+  --plate-bg: linear-gradient(#dfc184, #ad874a);
   --plate-ink: #2b2015;
   --light: 255 200 128;
-  --light-a: 0.46;
+  --light-a: 0.5;
+  --room: #1b1511;
 }
 
-/* 서점의 밤 (기본) */
-html[data-theme="night"] {
-  --color-paper: #1c201e;
-  --color-paper-2: #242a27;
-  --color-paper-3: #2c332f;
-  --color-lamp: #2a2620;
-  --color-ink: #ece6da;
-  --color-ink-2: #c7bfb1;
-  --color-ink-3: #938a7d;
-  --color-ink-4: #686159;
-  --color-rule: #343a36;
-  --color-accent: #d49a62;
-  --color-accent-soft: #b07f55;
-  --lamp: 255 190 120;
-  --lamp-a: 0.13;
-  --case-back: #242a27;
-  --case-back-2: #222825;
-  --case-post: #3b423e;
-  --case-post-hi: #56605a;
-  --case-board-top: #6e7771;
-  --case-board-front: #3e4541;
-  --case-crown: #2f3532;
-  --plate-bg: linear-gradient(#cfae72, #a9854a);
-  --plate-ink: #2b2015;
-  --light: 255 206 138;
-  --light-a: 0.42;
-}
-
-/* 숲속 서재 */
+/* 숲속 서재: 짙은 초록 방과 체리 원목 */
 html[data-theme="forest"] {
-  --color-paper: #17201b;
-  --color-paper-2: #1f2a23;
-  --color-paper-3: #27332b;
-  --color-lamp: #232a1f;
-  --color-ink: #e4eadc;
-  --color-ink-2: #bfc9b5;
-  --color-ink-3: #8b977f;
-  --color-ink-4: #5f6b57;
-  --color-rule: #2e3a31;
-  --color-accent: #c2cc8f;
-  --color-accent-soft: #93a06a;
-  --lamp: 225 222 160;
-  --lamp-a: 0.11;
-  --case-back: #1f2b22;
-  --case-back-2: #1d2820;
-  --case-post: #3b4b3c;
-  --case-post-hi: #56695a;
-  --case-board-top: #6f7d5c;
-  --case-board-front: #3b4a37;
-  --case-crown: #2a3629;
-  --plate-bg: linear-gradient(#d8d2a6, #a8a47a);
+  --color-paper: #151d18;
+  --color-paper-2: #1d2821;
+  --color-paper-3: #26322a;
+  --color-lamp: #222a1f;
+  --color-ink: #e6ecde;
+  --color-ink-2: #c1cbb7;
+  --color-ink-3: #8d9981;
+  --color-ink-4: #606c58;
+  --color-rule: #2d3a31;
+  --color-accent: #cdb97e;
+  --color-accent-soft: #9f9064;
+  --lamp: 232 214 150;
+  --lamp-a: 0.13;
+  --case-back: #2a1d15;
+  --case-wood: #6b4430;
+  --case-board: #7b4f35;
+  --case-hi: #b07a55;
+  --case-shade: 8 10 6;
+  --plate-bg: linear-gradient(#dcd4a8, #aaa479);
   --plate-ink: #1f2a1e;
   --light: 246 222 158;
-  --light-a: 0.4;
+  --light-a: 0.44;
+  --room: #151d18;
 }
 
-/* 새벽 */
+/* 새벽: 푸른 새벽빛과 물푸레나무(애쉬) */
 html[data-theme="dawn"] {
-  --color-paper: #181c24;
-  --color-paper-2: #20252f;
-  --color-paper-3: #282e3a;
-  --color-lamp: #232838;
-  --color-ink: #e3e7ef;
-  --color-ink-2: #bcc3d1;
-  --color-ink-3: #8791a3;
-  --color-ink-4: #5d6576;
-  --color-rule: #2c3240;
-  --color-accent: #a9bde0;
-  --color-accent-soft: #7f93b8;
-  --lamp: 170 190 235;
-  --lamp-a: 0.12;
-  --case-back: #222834;
-  --case-back-2: #20252f;
-  --case-post: #3a4150;
-  --case-post-hi: #566074;
-  --case-board-top: #6a7488;
-  --case-board-front: #3a4252;
-  --case-crown: #2b313d;
-  --plate-bg: linear-gradient(#d9dfea, #a7b1c4);
+  --color-paper: #171b23;
+  --color-paper-2: #1f242e;
+  --color-paper-3: #272d39;
+  --color-lamp: #222737;
+  --color-ink: #e4e8ef;
+  --color-ink-2: #bdc4d2;
+  --color-ink-3: #8892a4;
+  --color-ink-4: #5e6677;
+  --color-rule: #2b313f;
+  --color-accent: #b4c4e2;
+  --color-accent-soft: #8495b8;
+  --lamp: 176 196 240;
+  --lamp-a: 0.13;
+  --case-back: #2b2a29;
+  --case-wood: #6c645a;
+  --case-board: #7d7468;
+  --case-hi: #aca395;
+  --case-shade: 6 8 14;
+  --plate-bg: linear-gradient(#dde2ea, #a9b2c3);
   --plate-ink: #1d2330;
-  --light: 214 226 255;
-  --light-a: 0.34;
+  --light: 220 230 255;
+  --light-a: 0.36;
+  --room: #171b23;
 }
 
 /* 어두운 테마에서는 종이 결을 더 옅게 */
