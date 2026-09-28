@@ -5,13 +5,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ChapterMap from "@/components/book/ChapterMap";
 import ReadingTimer from "@/components/detail/ReadingTimer";
-import { getBook, getBooksByStatus, getChapterAt, getChapterEnd, getReadingPlan } from "@/lib/library";
+import { getBook, getAllBooks, getChapterAt, getChapterEnd, getReadingPlan } from "@/lib/library";
 
 // 이 화면에서는 아이폰 상단 상태바도 어둡게
 export const viewport = { themeColor: "#16130f" };
 
 export function generateStaticParams() {
-  return getBooksByStatus("reading").map((book) => ({ id: book.id }));
+  return getAllBooks().map((book) => ({ id: book.id }));
 }
 
 export default async function ReadPage({ params }: { params: Promise<{ id: string }> }) {

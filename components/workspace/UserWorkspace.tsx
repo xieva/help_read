@@ -12,13 +12,17 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import BookCover from "@/components/book/BookCover";
 import BookStage from "@/components/book/BookStage";
 import BookstoreShelf, { type ShelfBook } from "@/components/book/BookstoreShelf";
+import CatalogDetails from "@/components/catalog/CatalogDetails";
+import DiscoverCatalog from "@/components/catalog/DiscoverCatalog";
+import ReadingTimer from "@/components/detail/ReadingTimer";
+import { getCatalogBook, searchCatalog, type CatalogBook } from "@/lib/catalog";
 import DateLine from "@/components/home/DateLine";
 import ShelfToolbar from "@/components/library/ShelfToolbar";
 import { useWorkspace } from "./WorkspaceProvider";
 
 const statuses: Record<BookStatus, string> = { reading: "읽는 중", want: "읽고 싶은", finished: "다 읽은" };
 
-const toShelf = (b: PersonalBook): ShelfBook => ({ ...b, href: `/book?id=${encodeURIComponent(b.id)}` });
+const toShelf = (b: PersonalBook): ShelfBook => ({ ...b, href: `/book?id=${encodeURIComponent(b.id)}`, readHref: `/book?id=${encodeURIComponent(b.id)}&read=1` });
 const progress = (b: PersonalBook) => (b.totalPages ? Math.round((b.currentPage / b.totalPages) * 100) : 0);
 
 export default function UserWorkspace({ section }: { section: string }) {
@@ -39,6 +43,8 @@ export default function UserWorkspace({ section }: { section: string }) {
   // /library?book=<id> 는 예전처럼 바로 편집 창을 열어요
   const editId = params.get("book");
   const detailId = params.get("id");
+  const catalogSeed = getCatalogBook(params.get("add") ?? "");
+  const fromNew = params.get("new") === "1";
   const detailBook = detail ? books.find((b) => b.id === detailId) : undefined;
   const editBook = editing ? detailBook : books.find((b) => b.id === editId);
 
@@ -57,7 +63,7 @@ export default function UserWorkspace({ section }: { section: string }) {
   const close = () => {
     setAdding(false);
     setEditing(false);
-    if (editId) router.replace(section, { scroll: false });
+    if (editId || catalogSeed || fromNew) router.replace(section, { scroll: false });
   };
   const save = (input: BookInput, previous?: PersonalBook) => {
     const book = makeBook(input, previous);
@@ -84,11 +90,12 @@ export default function UserWorkspace({ section }: { section: string }) {
     </header>
   );
 
-  const editor = (adding || editBook) && (
+  const editor = (adding || editBook || catalogSeed || fromNew) && (
     <BookEditor
-      key={editBook?.id ?? "new"}
+      key={editBook?.id ?? catalogSeed?.id ?? "new"}
       book={editBook}
-      defaultStatus={discover ? "want" : "reading"}
+      seed={catalogSeed}
+      defaultStatus={discover || catalogSeed ? "want" : "reading"}
       onClose={close}
       onSave={save}
       onDelete={remove}
@@ -109,6 +116,12 @@ export default function UserWorkspace({ section }: { section: string }) {
       );
     }
     const b = detailBook;
+    if (params.get("read") === "1") return <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-night px-6 text-night-ink">
+      <Link href={`/book?id=${encodeURIComponent(b.id)}`} className="absolute top-8 left-6 text-sm">← 책으로</Link>
+      <p className="text-sm text-night-ink/60">{b.title}</p><h1 className="mt-6 font-serif text-4xl">{Math.min(b.totalPages, Math.max(1, b.currentPage))}쪽부터.</h1>
+      <p className="my-8 text-sm text-night-ink/60">가지고 있는 책을 펼치고, 읽는 데 집중해 보세요.</p><ReadingTimer />
+      <Link href={`/library?book=${encodeURIComponent(b.id)}`} className="mt-12 rounded border border-night-ink/30 px-6 py-3 text-sm">읽은 쪽 기록하기</Link>
+    </div>;
     return (
       <div className="wrap pt-4 pb-16 md:pt-2">
         <div className="flex h-12 items-center justify-between">
@@ -154,10 +167,13 @@ export default function UserWorkspace({ section }: { section: string }) {
             </div>
           </div>
         </div>
+        <CatalogDetails book={b} />
         {editor}
       </div>
     );
   }
+
+  if (discover) return <DiscoverCatalog />;
 
   const library = section === "/library";
 
@@ -204,16 +220,7 @@ export default function UserWorkspace({ section }: { section: string }) {
         </p>
       )}
 
-      {discover ? (
-        <section className="reader-empty">
-          <h2>다음에 읽을 책을 모아두세요.</h2>
-          <p>책을 추가할 때 상태를 ‘읽고 싶은’으로 선택하면 됩니다.</p>
-          <p className="text-sm">자동 추천은 준비 중이에요.</p>
-          <Link href="/library" className="reader-button mt-5">
-            서재 보기
-          </Link>
-        </section>
-      ) : books.length === 0 ? (
+      {books.length === 0 ? (
         <section className="reader-empty">
           <div className="empty-volumes" aria-hidden="true">
             <i />
@@ -306,11 +313,22 @@ export default function UserWorkspace({ section }: { section: string }) {
   );
 }
 
-function BookEditor({ book, defaultStatus, onClose, onSave, onDelete, storageError }: { book?: PersonalBook; defaultStatus: BookStatus; onClose: () => void; onSave: (input: BookInput, previous?: PersonalBook) => boolean; onDelete: (id: string) => void; storageError: string }) {
+function BookEditor({ book, seed, defaultStatus, onClose, onSave, onDelete, storageError }: { book?: PersonalBook; seed?: CatalogBook; defaultStatus: BookStatus; onClose: () => void; onSave: (input: BookInput, previous?: PersonalBook) => boolean; onDelete: (id: string) => void; storageError: string }) {
   const ref = useRef<HTMLDialogElement>(null);
   const [status, setStatus] = useState<BookStatus>(book?.status ?? defaultStatus);
   const [validation, setValidation] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [lookup, setLookup] = useState("");
+  const [matchNotice, setMatchNotice] = useState(seed ? `${seed.title} · 소개와 아트 커버가 연결돼요.` : "");
+  const choose = (entry: CatalogBook) => {
+    const form = ref.current?.querySelector("form");
+    if (!form) return;
+    for (const name of ["title", "author", "genre"] as const) {
+      const field = form.elements.namedItem(name) as HTMLInputElement;
+      field.value = entry[name];
+    }
+    setLookup(""); setMatchNotice(`${entry.title} · 소개와 아트 커버가 연결돼요.`);
+  };
   useEffect(() => { const d = ref.current; const oldOverflow = document.documentElement.style.overflow; d?.showModal(); document.documentElement.style.overflow = "hidden"; return () => { document.documentElement.style.overflow = oldOverflow; d?.close(); }; }, []);
   const submit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault(); const f = new FormData(e.currentTarget); const totalPages = Number(f.get("totalPages"));
@@ -319,7 +337,11 @@ function BookEditor({ book, defaultStatus, onClose, onSave, onDelete, storageErr
   };
   return <dialog ref={ref} className="reader-dialog" aria-labelledby="book-editor-title" onCancel={(e) => { e.preventDefault(); onClose(); }} onClick={(e) => { if (e.target === ref.current) { const r=ref.current.getBoundingClientRect(); if(e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) onClose(); } }}>
     <div className="flex items-center justify-between gap-6"><h2 id="book-editor-title" className="text-2xl font-medium">{book ? "책과 기록" : "책 추가"}</h2><button type="button" onClick={onClose} className="reader-close" aria-label="닫기">✕</button></div>
-    <form onSubmit={submit} className="reader-form mt-7"><label>제목<input autoFocus name="title" required maxLength={120} defaultValue={book?.title} placeholder="책 제목" /></label><label>저자<input name="author" required maxLength={100} defaultValue={book?.author} placeholder="저자 이름" /></label><label>분류<input name="genre" maxLength={40} defaultValue={book?.genre} placeholder="예: 소설, 인문, 경제" /></label><label>독서 상태<select aria-label="독서 상태" name="status" value={status} onChange={(e) => setStatus(e.target.value as BookStatus)}>{(Object.keys(statuses) as BookStatus[]).map((s) => <option key={s} value={s}>{statuses[s]}</option>)}</select></label><div className="grid grid-cols-2 gap-4"><label>전체 쪽수<input name="totalPages" type="number" inputMode="numeric" required min="1" max="100000" step="1" defaultValue={book?.totalPages} /></label><label>읽은 쪽수<input aria-label="읽은 쪽수" name="currentPage" type="number" inputMode="numeric" min="0" step="1" disabled={status !== "reading"} defaultValue={book?.currentPage ?? 0} /><span className="text-xs text-ink-3">{status === "finished" ? "전체 쪽수로 저장" : status === "want" ? "0쪽으로 저장" : ""}</span></label></div><label>메모<textarea aria-label="메모" name="note" rows={4} maxLength={10000} defaultValue={book?.note} placeholder="남기고 싶은 문장이나 생각" /></label>
+    {!book && <div className="catalog-match"><label className="text-sm">카탈로그에서 찾기<input aria-label="카탈로그에서 찾기" value={lookup} onChange={(e) => setLookup(e.target.value)} placeholder="제목 또는 저자" /></label>
+      {lookup.trim() && (searchCatalog(lookup).length ? searchCatalog(lookup).slice(0, 5).map((b) => <button type="button" key={b.id} onClick={() => choose(b)}>{b.title}<span>{b.author}</span></button>) : <p className="mt-3 text-xs text-ink-3">아직 없는 책이에요. 아래에서 직접 입력할 수 있어요.</p>)}
+      {matchNotice && <p className="mt-3 text-xs text-ink-2" role="status">{matchNotice}</p>}<p className="mt-2 text-xs text-ink-3">쪽수는 가지고 있는 판본에 맞춰 입력해 주세요.</p>
+    </div>}
+    <form onSubmit={submit} className="reader-form mt-7"><label>제목<input autoFocus name="title" required maxLength={120} defaultValue={book?.title ?? seed?.title} placeholder="책 제목" /></label><label>저자<input name="author" required maxLength={100} defaultValue={book?.author ?? seed?.author} placeholder="저자 이름" /></label><label>분류<input name="genre" maxLength={40} defaultValue={book?.genre ?? seed?.genre} placeholder="예: 소설, 인문, 경제" /></label><label>독서 상태<select aria-label="독서 상태" name="status" value={status} onChange={(e) => setStatus(e.target.value as BookStatus)}>{(Object.keys(statuses) as BookStatus[]).map((s) => <option key={s} value={s}>{statuses[s]}</option>)}</select></label><div className="grid grid-cols-2 gap-4"><label>전체 쪽수<input name="totalPages" type="number" inputMode="numeric" required min="1" max="100000" step="1" defaultValue={book?.totalPages} /></label><label>읽은 쪽수<input aria-label="읽은 쪽수" name="currentPage" type="number" inputMode="numeric" min="0" step="1" disabled={status !== "reading"} defaultValue={book?.currentPage ?? 0} /><span className="text-xs text-ink-3">{status === "finished" ? "전체 쪽수로 저장" : status === "want" ? "0쪽으로 저장" : ""}</span></label></div><label>메모<textarea aria-label="메모" name="note" rows={4} maxLength={10000} defaultValue={book?.note} placeholder="남기고 싶은 문장이나 생각" /></label>
       {(validation || storageError) && <p className="reader-error" role="alert">{validation || storageError}</p>}<button className="reader-button w-full" type="submit">{book ? "저장" : "서재에 추가"}</button>
     </form>
     {book && <div className="mt-5 border-t border-rule pt-5">{confirmDelete ? <div><p className="mb-3 text-sm">이 책과 메모를 서재에서 삭제할까요?</p><div className="flex gap-5"><button className="text-sm text-red-800 underline" onClick={() => onDelete(book.id)}>삭제하기</button><button className="text-sm" onClick={() => setConfirmDelete(false)}>취소</button></div></div> : <button className="text-sm text-ink-3 underline" onClick={() => setConfirmDelete(true)}>서재에서 삭제</button>}</div>}

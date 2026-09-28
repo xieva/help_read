@@ -840,3 +840,39 @@
 .bm-option.is-on .bm-thumb {
   outline-color: var(--color-accent);
 }
+
+/* A selected book occupies the left side of its own shelf; metadata stays to its right. */
+.bs-shelf { transition: height 400ms var(--ease-book); }
+.bs-shelf.has-selection { height: 196px; min-width: 0; }
+.bs-shelf.has-selection > .bs-slot:not(.is-selected),
+.bs-shelf.has-selection > .bs-ghosts,
+.bs-shelf.has-selection > .bs-pop,
+.bs-shelf.has-selection > .bs-empty { opacity: .12; }
+.bs-shelf.has-selection .bs-slot.is-selected {
+  position: absolute; left: 5px; bottom: 10px; --k: 1.08;
+  width: 104px; margin: 0; z-index: 6;
+}
+.bs-info {
+  position: absolute; left: 114px; right: 8px; bottom: 10px; z-index: 7;
+  border: 1px solid #ffffff16; border-radius: 5px;
+  padding: 12px; background: #d8dbd8; color: #252c28;
+  box-shadow: 0 8px 24px #0003;
+  animation: shelf-info-in 300ms var(--ease-out-soft) both;
+}
+.bs-info h3 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; font-size: 14px; font-weight: 600; line-height: 1.4; word-break: keep-all; overflow-wrap: anywhere; }
+.bs-info-status { font-size: 10px; letter-spacing: .04em; color: #515b54; margin-bottom: 3px; }
+.bs-info-author { font-size: 11px; color: #525951; margin-top: 3px; }
+.bs-info dl { margin-top: 10px; font-size: 10px; color: #48514a; }
+.bs-info dl div { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 3px; }
+.bs-info dd { color: #252c28; }
+.bs-info-actions { display: flex; gap: 5px; margin-top: 10px; }
+.bs-info-actions a { min-height: 34px; display: flex; align-items: center; justify-content: center; flex: 1; border: 1px solid #9ca49e; border-radius: 3px; font-size: 11px; white-space: nowrap; }
+.bs-info-actions a:first-child { background: #303d34; color: #f3f5ef; border-color: #303d34; }
+.bs-info-actions a:focus-visible { outline: 2px solid #354b7e; outline-offset: 3px; }
+.bs-ghosts { display: flex; align-items: flex-end; gap: 3px; flex: 0 1 auto; overflow: hidden; pointer-events: none; opacity: .22; }
+.bs-ghosts i { display: block; flex-shrink: 0; border: 1px solid #e0ded44a; border-radius: 2px 2px 0 0; background: linear-gradient(90deg,#b8b5aa20,#d7d5c854,#8a8d8620); box-shadow: inset 2px 0 #ffffff15; }
+.bs-shelf .bs-empty { position: absolute; bottom: 12px; left: 18px; z-index: 4; background: var(--case-back); padding: 7px 10px; }
+.bs-strip .bs-shelf.has-selection { min-width: 320px; }
+.bs-strip .bs-info { max-width: 220px; }
+@keyframes shelf-info-in { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+@media (prefers-reduced-motion: reduce) { .bs-shelf { transition: none; } .bs-info { animation: none; } }

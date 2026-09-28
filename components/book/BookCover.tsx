@@ -3,6 +3,8 @@
 // 표지 스타일은 5가지: classic / frame / band / type / minimal
 
 import type { Cover } from "@/data/books";
+import { matchCatalogBook } from "@/lib/catalog";
+import CatalogCoverArt from "./CatalogCoverArt";
 
 export type CoverBook = {
   title: string;
@@ -19,6 +21,7 @@ type Props = {
 
 export default function BookCover({ book, className = "", style }: Props) {
   const { cover } = book;
+  const catalog = matchCatalogBook(book);
 
   return (
     <div
@@ -28,7 +31,7 @@ export default function BookCover({ book, className = "", style }: Props) {
       {book.coverImage ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={book.coverImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
-      ) : (
+      ) : catalog ? <CatalogCoverArt book={catalog} /> : (
         <CoverArt book={book} />
       )}
     </div>

@@ -5,11 +5,11 @@
 // - 카테고리 하나 = 책장 하나. 책장 안에서는 선반 4칸이 위아래로 쌓여요.
 //   한 책장이 가득 차면 같은 카테고리의 다음 책장이 오른쪽에 이어지고, 책장끼리는 좌우로 넘겨요.
 // - 책은 진짜 3D 오브젝트(표지·책등·윗면·종이 면)예요. 책등이 보이게 꽂혀 있다가
-//   한 번 누르면 옆 책들이 비켜나며 표지 쪽으로 돌아 나오고, 한 번 더 누르면 열려요.
-// - 맨 윗칸에는 "지금 읽는 책"을 표지가 보이게 세워 두고, 빈 곳에는 눕혀 둔 책·화분 같은 소품을 놓아요.
+//   한 번 누르면 옆 책들이 비켜나며 표지 쪽으로 돌아 나오고, 한 번 더 누르면 제자리에 꽂혀요.
+// - 모든 책은 책등이 보이게 세워요. 빈 곳은 반투명 책등으로 채워요.
 // ─────────────────────────────────────────────────────────────
 
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { BookStatus, Cover } from "@/data/books";
 import BookCover from "./BookCover";
@@ -26,6 +26,8 @@ export type ShelfBook = {
   cover: Cover;
   coverImage?: string;
   href: string;
+  readHref?: string;
+  lastReadAt?: string;
 };
 
 type Props = {
@@ -59,8 +61,7 @@ function dims(b: ShelfBook) {
   };
 }
 
-type Decor = { kind: "stack" | "plant" | "bookend"; seed: number };
-type Shelf = { face?: ShelfBook; spines: ShelfBook[]; free: number; decor: Decor[]; pop?: string };
+type Shelf = { spines: ShelfBook[]; free: number; pop?: string };
 type Bay = { key: string; category: string; part: number; shelves: Shelf[]; count: number };
 
 function buildBays(books: ShelfBook[]): Bay[] {
@@ -76,8 +77,7 @@ function buildBays(books: ShelfBook[]): Bay[] {
     .sort((a, b) => b[1].length - a[1].length)
     .forEach(([category, list]) => {
       const sorted = [...list].sort((a, b) => order[a.status] - order[b.status]);
-      const face = sorted.find((b) => b.status === "reading");
-      const rest = sorted.filter((b) => b !== face);
+      const rest = sorted;
       const mine: Bay[] = [];
       const lastBay = () => mine[mine.length - 1];
       const lastShelf = () => lastBay().shelves[lastBay().shelves.length - 1];
@@ -85,21 +85,16 @@ function buildBays(books: ShelfBook[]): Bay[] {
         if (mine.length === 0 || lastBay().shelves.length === SHELVES) {
           mine.push({ key: `${category}-${mine.length + 1}`, category, part: mine.length + 1, shelves: [], count: 0 });
         }
-        lastBay().shelves.push({ spines: [], free: BAY_INNER, decor: [] });
+        lastBay().shelves.push({ spines: [], free: BAY_INNER });
       };
 
       newShelf();
-      if (face) {
-        lastShelf().face = face;
-        lastShelf().free -= dims(face).bw + 12;
-        lastBay().count += 1;
-      }
       // 책장 하나에 다 들어가면 선반마다 고르게 나눠 꽂아요 (서점 진열처럼). 넘치면 폭이 찰 때까지 채워요.
-      const totalWidth = rest.reduce((n, b) => n + dims(b).t + 3, face ? dims(face).bw + 12 : 0);
+      const totalWidth = rest.reduce((n, b) => n + dims(b).t + 3, 0);
       const fitsOneBay = totalWidth <= BAY_INNER * SHELVES * 0.9;
-      const slots = rest.length + (face ? 2 : 0);
+      const slots = rest.length;
       const perShelf = Math.max(3, Math.ceil(slots / SHELVES));
-      const used = (s: Shelf) => s.spines.length + (s.face ? 2 : 0);
+      const used = (s: Shelf) => s.spines.length;
       rest.forEach((b) => {
         const need = dims(b).t + 3;
         if (lastShelf().free < need || (fitsOneBay && used(lastShelf()) >= perShelf)) newShelf();
@@ -107,36 +102,23 @@ function buildBays(books: ShelfBook[]): Bay[] {
         lastShelf().free -= need;
         lastBay().count += 1;
       });
-      while (lastBay().shelves.length < SHELVES) lastBay().shelves.push({ spines: [], free: BAY_INNER, decor: [] });
+      while (lastBay().shelves.length < SHELVES) lastBay().shelves.push({ spines: [], free: BAY_INNER });
       bays.push(...mine);
     });
 
-  // POP 카드와 소품 배치
+  // 선반의 작은 상태 카드
   bays.forEach((bay) => {
-    const all = bay.shelves.flatMap((s) => [...(s.face ? [s.face] : []), ...s.spines]);
+    const all = bay.shelves.flatMap((s) => s.spines);
     const finished = all.filter((b) => b.status === "finished").length;
     const want = all.filter((b) => b.status === "want").length;
-    const lastFilled = bay.shelves.reduce((last, s, i) => (s.face || s.spines.length ? i : last), -1);
+    const lastFilled = bay.shelves.reduce((last, s, i) => (s.spines.length ? i : last), -1);
     bay.shelves.forEach((shelf, i) => {
-      if (shelf.face) {
-        const f = shelf.face;
-        shelf.pop = `${f.currentPage}쪽까지 읽었어요\n${Math.max(0, f.totalPages - f.currentPage)}쪽 남음`;
-      } else if (i === lastFilled && i > 0) {
+      if (i === lastFilled && i > 0) {
         if (finished > 0) shelf.pop = `다 읽은 책 ${finished}권 ✓`;
         else if (want > 0) shelf.pop = `읽고 싶은 책 ${want}권`;
       }
       if (shelf.pop && shelf.free < 120) shelf.pop = undefined;
-      const seed = seedOf(`${bay.key}-${i}`);
-      const room = shelf.free - (shelf.pop ? 124 : 0);
-      if (shelf.spines.length > 0 && room > 30) shelf.decor.push({ kind: "bookend", seed });
-      if (room > 110) {
-        const first = seed % 3 === 0 ? "plant" : "stack";
-        shelf.decor.push({ kind: first, seed });
-        // 빈 선반에는 소품을 하나 더 (앞의 것과 다른 종류로)
-        if (!shelf.face && shelf.spines.length === 0 && room > 200) {
-          shelf.decor.push({ kind: first === "plant" ? "stack" : "plant", seed: seed + 7 });
-        }
-      }
+
     });
   });
   return bays;
@@ -146,17 +128,16 @@ export default function BookstoreShelf({ books, variant = "store", onAdd }: Prop
   const bays = useMemo(() => buildBays(books), [books]);
   const root = useRef<HTMLDivElement>(null);
   const scroller = useRef<HTMLDivElement>(null);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [index, setIndex] = useState(0);
+  const [atEnd, setAtEnd] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
-  const [entering, setEntering] = useState<string | null>(null);
-  const router = useRouter();
 
   // 지금 보고 있는 책장 번호 (좌우로 넘길 때 갱신) + 넘기면 꺼낸 책은 제자리로
   useEffect(() => {
     const el = scroller.current;
     if (!el) return;
     const update = () => {
+      setAtEnd(el.scrollLeft >= el.scrollWidth - el.clientWidth - 2);
       const bay = el.querySelector<HTMLElement>(".bs-bay");
       const step = bay ? bay.offsetWidth + 14 : 1;
       const next = Math.min(bays.length - 1, Math.round(el.scrollLeft / step));
@@ -167,7 +148,9 @@ export default function BookstoreShelf({ books, variant = "store", onAdd }: Prop
     };
     update();
     el.addEventListener("scroll", update, { passive: true });
-    return () => el.removeEventListener("scroll", update);
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => { el.removeEventListener("scroll", update); observer.disconnect(); };
   }, [bays.length]);
 
   // 책장 바깥을 누르면 꺼낸 책을 다시 꽂아요
@@ -178,7 +161,6 @@ export default function BookstoreShelf({ books, variant = "store", onAdd }: Prop
     document.addEventListener("pointerdown", dismiss);
     return () => {
       document.removeEventListener("pointerdown", dismiss);
-      if (timer.current) clearTimeout(timer.current);
     };
   }, []);
 
@@ -189,21 +171,12 @@ export default function BookstoreShelf({ books, variant = "store", onAdd }: Prop
     el.scrollTo({ left: to * (bay.offsetWidth + 14), behavior: "smooth" });
   };
 
-  // 첫 번째 누름: 꺼내서 표지 보기 / 두 번째 누름: 열기
-  const tap = (book: ShelfBook) => {
-    if (entering) return;
-    if (selected !== book.id) {
-      setSelected(book.id);
-      return;
-    }
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    setEntering(book.id);
-    timer.current = setTimeout(() => router.push(book.href), reduce ? 0 : 360);
-  };
+  // Navigation belongs to the explicit actions; the book itself only toggles selection.
+  const tap = (book: ShelfBook) => setSelected((id) => id === book.id ? null : book.id);
 
   const active = books.find((b) => b.id === selected);
 
-  const renderBook = (b: ShelfBook, displayed = false) => {
+  const renderBook = (b: ShelfBook) => {
     const d = dims(b);
     const isSelected = selected === b.id;
     const object = (
@@ -232,7 +205,7 @@ export default function BookstoreShelf({ books, variant = "store", onAdd }: Prop
         key={b.id}
         type="button"
         onClick={() => tap(b)}
-        className={`bs-slot ${displayed ? "is-displayed" : ""} ${isSelected ? "is-selected" : ""} ${entering === b.id ? "is-entering" : ""}`}
+        className={`bs-slot ${isSelected ? "is-selected" : ""}`}
         style={
           {
             "--h": `${d.h}px`,
@@ -242,10 +215,12 @@ export default function BookstoreShelf({ books, variant = "store", onAdd }: Prop
             "--ink": b.cover.ink,
           } as React.CSSProperties
         }
-        aria-label={`${b.title}, ${b.author}. ${isSelected ? "한 번 더 누르면 열려요" : "눌러서 꺼내 보기"}`}
+        aria-label={`${b.title}, ${b.author}. ${isSelected ? "다시 누르면 꽂기" : "눌러서 꺼내 보기"}`}
         aria-pressed={isSelected}
+        aria-expanded={isSelected}
+        onKeyDown={(e) => { if (e.key === "Escape") setSelected(null); }}
       >
-        {displayed && <span className="bs-face-label">지금 읽는 중</span>}
+
         {isSelected ? <BookMorph id={b.id}>{object}</BookMorph> : object}
       </button>
     );
@@ -260,7 +235,7 @@ export default function BookstoreShelf({ books, variant = "store", onAdd }: Prop
             {active.author} · {statusText[active.status]}
             {active.status === "reading" && ` · ${active.currentPage}/${active.totalPages}쪽`}
           </span>
-          <em>한 번 더 누르면 열려요</em>
+          <em>책을 다시 누르면 꽂혀요</em>
         </p>
       ) : (
         <p>
@@ -277,7 +252,7 @@ export default function BookstoreShelf({ books, variant = "store", onAdd }: Prop
           <button type="button" className="bs-arrow" aria-label="이전 책장" disabled={index === 0} onClick={() => go(index - 1)}>
             ←
           </button>
-          <button type="button" className="bs-arrow" aria-label="다음 책장" disabled={index >= bays.length - 1} onClick={() => go(index + 1)}>
+          <button type="button" className="bs-arrow" aria-label="다음 책장" disabled={atEnd} onClick={() => go(index + 1)}>
             →
           </button>
         </div>
@@ -291,9 +266,10 @@ export default function BookstoreShelf({ books, variant = "store", onAdd }: Prop
         <div className="bs-bay bs-strip">
           <div className="bs-crown" aria-hidden />
           <div className="no-scrollbar overflow-x-auto">
-            <div className="bs-shelf">
+            <div className={`bs-shelf ${active ? "has-selection" : ""}`}>
               <span className="bs-lamp" aria-hidden />
               {books.map((b) => renderBook(b))}
+              {active && <ShelfInfo book={active} />}
             </div>
           </div>
           <div className="bs-board" aria-hidden />
@@ -311,7 +287,7 @@ export default function BookstoreShelf({ books, variant = "store", onAdd }: Prop
       <div ref={scroller} className="bs-scroller no-scrollbar" role="group" aria-label="책장. 좌우로 넘겨 보세요">
         {bays.map((bay) => {
           const many = bays.filter((b) => b.category === bay.category).length > 1;
-          const firstEmpty = bay.shelves.findIndex((s) => !s.face && s.spines.length === 0);
+          const firstEmpty = bay.shelves.findIndex((s) => s.spines.length === 0);
           return (
             <section key={bay.key} className="bs-bay" aria-label={`${bay.category} 책장`}>
               <div className="bs-crown">
@@ -323,13 +299,13 @@ export default function BookstoreShelf({ books, variant = "store", onAdd }: Prop
               </div>
               {bay.shelves.map((shelf, i) => (
                 <div key={i} className="bs-compartment">
-                  <div className="bs-shelf">
+                  <div className={`bs-shelf ${shelf.spines.some((b) => b.id === selected) ? "has-selection" : ""}`}>
                     <span className="bs-lamp" aria-hidden />
-                    {shelf.face && renderBook(shelf.face, true)}
                     {shelf.spines.map((b) => renderBook(b))}
-                    {shelf.decor.map((d, j) => (
-                      <DecorPiece key={j} decor={d} />
-                    ))}
+                    {active && shelf.spines.some((b) => b.id === active.id) && <ShelfInfo book={active} />}
+                    <span className="bs-ghosts" aria-hidden="true">
+                      {Array.from({ length: Math.max(0, Math.floor((shelf.free - 15) / 23)) }, (_, j) => <i key={j} style={{ height: `${75 + (j * 17 + i * 11) % 31}px`, width: `${14 + (j * 7) % 9}px` }} />)}
+                    </span>
                     {onAdd && i === firstEmpty && (
                       <button type="button" className="bs-empty" onClick={onAdd}>
                         + 여기에 다음 책 꽂기
@@ -350,36 +326,17 @@ export default function BookstoreShelf({ books, variant = "store", onAdd }: Prop
   );
 }
 
-// 선반 위 소품: 눕혀 쌓은 책 · 작은 화분 · 북엔드
-const stackColors = ["#6d5a4a", "#3f4b45", "#8c7457", "#54505e", "#9a8a6c", "#5b3f35", "#44535f"];
-function DecorPiece({ decor }: { decor: Decor }) {
-  if (decor.kind === "bookend") return <span className="bs-bookend" aria-hidden />;
-  if (decor.kind === "plant") {
-    return (
-      <span className="bs-plant" aria-hidden>
-        <svg viewBox="0 0 40 56" width="100%" height="100%">
-          <path d="M20 34 C18 22 10 18 5 12 C13 14 18 20 20 30 Z" fill="#5d7a4f" />
-          <path d="M20 34 C22 20 30 14 36 8 C30 18 24 24 21 32 Z" fill="#6f8f5c" />
-          <path d="M20 34 C20 24 17 14 19 4 C23 14 22 24 21 34 Z" fill="#4f6b44" />
-          <path d="M8 34 H32 L29 55 H11 Z" fill="#b8835e" />
-          <path d="M7 32 H33 V36 H7 Z" fill="#c99670" />
-        </svg>
-      </span>
-    );
-  }
-  const count = 2 + (decor.seed % 3);
-  return (
-    <span className="bs-stack" aria-hidden>
-      {Array.from({ length: count }, (_, i) => (
-        <span
-          key={i}
-          style={{
-            width: `${54 + ((decor.seed >> (i * 3)) % 26)}px`,
-            marginLeft: `${((decor.seed >> (i * 2)) % 7) - 3}px`,
-            background: stackColors[(decor.seed + i * 3) % stackColors.length],
-          }}
-        />
-      ))}
-    </span>
-  );
+function ShelfInfo({ book }: { book: ShelfBook }) {
+  const date = book.lastReadAt ? new Date(book.lastReadAt) : null;
+  const lastRead = date && !Number.isNaN(date.valueOf())
+    ? new Intl.DateTimeFormat("ko-KR", { month: "numeric", day: "numeric", timeZone: "Asia/Seoul" }).format(date)
+    : "아직 기록 없음";
+  const readHref = book.readHref ?? `${book.href}/read`;
+  return <div className="bs-info" role="region" aria-label={`${book.title} 책 정보`} onKeyDown={(e) => { if (e.key === "Escape") e.currentTarget.parentElement?.querySelector<HTMLButtonElement>(".is-selected")?.click(); }}>
+    <p className="bs-info-status">{statusText[book.status]}</p>
+    <h3>{book.title}</h3>
+    <p className="bs-info-author">{book.author}</p>
+    <dl><div><dt>마지막 독서</dt><dd>{lastRead}</dd></div><div><dt>읽은 쪽</dt><dd>{book.currentPage} / {book.totalPages}</dd></div></dl>
+    <div className="bs-info-actions"><Link href={readHref}>읽기</Link><Link href={book.href}>상세 정보</Link></div>
+  </div>;
 }

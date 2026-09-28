@@ -3,6 +3,7 @@
 
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import CatalogDetails from "@/components/catalog/CatalogDetails";
 import BookStage from "@/components/book/BookStage";
 import BookCover from "@/components/book/BookCover";
 import ChapterMap from "@/components/book/ChapterMap";
@@ -177,6 +178,7 @@ export default async function BookPage({ params }: { params: Promise<{ id: strin
 
               {/* 아래로 이어지는 이야기들 */}
               <div className="mt-20 space-y-16 md:mt-28 md:space-y-20">
+                <CatalogDetails book={book} />
                 {whyNow && (
                   <DetailSection label="지금 읽기 좋은 이유">
                     <p className="font-serif text-[21px] leading-[1.65]">{whyNow.bridge}</p>

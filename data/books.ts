@@ -34,6 +34,7 @@ export type Memo = {
 };
 
 export type Book = {
+  catalogId?: string; // 공용 작품 카탈로그 연결. 판본/ISBN과는 별개.
   id: string; // 주소에 쓰이는 이름. 예: /books/sapiens
   title: string;
   author: string;

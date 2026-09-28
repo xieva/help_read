@@ -10,6 +10,7 @@ import Nav from "@/components/Nav";
 import "./globals.css";
 import "./themes.css";
 import "./bookstore.css";
+import "./catalog.css";
 
 // 글꼴: 한글 명조(Noto Serif KR) + 숫자·영문용 Garamond
 // 빌드할 때 글꼴 파일을 내려받지 않고, 브라우저가 필요한 글자만 Google Fonts 에서 가져옵니다.

@@ -13,6 +13,8 @@ import { animate, motion, useMotionValue, useReducedMotion, useTransform } from 
 import { useRef, useState } from "react";
 import BookCover, { type CoverBook } from "./BookCover";
 import BookMorph from "./BookMorph";
+import CatalogCoverArt from "./CatalogCoverArt";
+import { matchCatalogBook } from "@/lib/catalog";
 import { BookmarkArt, type BookmarkId } from "./Bookmark";
 
 export type ViewerBook = CoverBook & {
@@ -226,11 +228,13 @@ export default function BookViewer({ book, bookmark, morphId, className = "" }: 
 
 // 뒤표지: 실제 이미지(coverBackImage)가 있으면 이미지, 없으면 소개글 + 바코드로 그려요
 function BookBack({ book }: { book: ViewerBook }) {
+  const catalog = matchCatalogBook(book);
   const bg = `color-mix(in oklab, ${book.cover.bg} 90%, black)`;
   if (book.coverBackImage) {
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={book.coverBackImage} alt="" className="h-full w-full object-cover" />;
   }
+  if (catalog && !book.coverImage) return <div className="relative h-full w-full @container"><CatalogCoverArt book={catalog} back /></div>;
   const blurb = book.description
     ? Array.from(book.description).length > 70
       ? Array.from(book.description).slice(0, 68).join("") + "…"

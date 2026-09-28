@@ -1,5 +1,6 @@
 import type { Book, BookStatus } from "@/data/books";
 import { uid } from "./uid";
+import { matchCatalogBook, normalizeBookText } from "./catalog";
 
 export const LIBRARY_KEY = "reader.user-library.v1";
 // 계정마다 서재를 따로 저장해요. (로그인 기능 전의 기록은 LIBRARY_KEY 에 남아 있어요)
@@ -19,16 +20,21 @@ export function validateInput(input: BookInput): string | null {
 
 export function makeBook(input: BookInput, previous?: PersonalBook): PersonalBook {
   const now = new Date().toISOString();
+  const catalog = matchCatalogBook(input);
+  const sameWork = previous && normalizeBookText(previous.title) === normalizeBookText(input.title) && normalizeBookText(previous.author) === normalizeBookText(input.author);
+  const newPage = input.status === "finished" ? input.totalPages : input.status === "want" ? 0 : input.currentPage;
+  const readingChanged = newPage > (previous?.currentPage ?? 0);
   const colors = ["#46544c", "#75615c", "#374758", "#a29379", "#756e84"];
   const color = colors[Array.from(input.title).reduce((n, c) => n + c.charCodeAt(0), 0) % colors.length];
   return {
     ...previous, ...input, id: previous?.id ?? uid("personal-"),
     title: input.title.trim(), author: input.author.trim(), genre: input.genre.trim() || "미분류",
     publisher: previous?.publisher ?? "", year: previous?.year ?? new Date().getFullYear(),
-    addedAt: previous?.addedAt ?? now, lastReadAt: input.status === "reading" ? now : previous?.lastReadAt,
+    addedAt: previous?.addedAt ?? now, lastReadAt: readingChanged ? now : previous?.lastReadAt,
     finishedAt: input.status === "finished" ? previous?.finishedAt ?? now : undefined,
     currentPage: input.status === "finished" ? input.totalPages : input.status === "want" ? 0 : input.currentPage,
-    description: "", note: input.note, cover: previous?.cover ?? { bg: color, ink: "#f5f1e8", style: "classic", size: 1 },
+    catalogId: catalog?.id,
+    description: catalog?.summary ?? (sameWork ? previous?.description ?? "" : ""), note: input.note, cover: previous?.cover ?? { bg: color, ink: "#f5f1e8", style: "classic", size: 1 },
   };
 }
 
