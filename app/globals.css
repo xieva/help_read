@@ -502,3 +502,44 @@ body::before {
 .ghost-stack .ghost-book { height: 24px; width: calc(var(--ghost-h) * .83); transform-origin: center; }
 .ghost-stack .ghost-book::before { inset: 5px 10px 5px 20%; height: auto; border: 0; background: repeating-linear-gradient(0deg, transparent 0 2px, #83917c45 2px 3px); }
 .ghost-stack .ghost-book::after, .ghost-stack .ghost-book > span { display: none; }
+
+/* Functional workspace UI; full art direction awaits design approval. */
+.reader-button { display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:11px 20px; background:var(--color-ink); color:var(--color-paper); border:1px solid var(--color-ink); border-radius:4px; font-size:14px; cursor:pointer; }
+.reader-button.secondary { background:transparent; color:var(--color-ink); border-color:var(--color-rule); }
+.reader-button:focus-visible, .reader-close:focus-visible { outline:2px solid var(--color-accent); outline-offset:4px; }
+.reader-empty { padding:45px 20px 60px; text-align:center; border-block:1px solid var(--color-rule); margin-top:16px; }
+.reader-empty h2 { font-size:24px; font-weight:500; }
+.reader-empty p { color:var(--color-ink-2); margin-top:12px; }
+.empty-volumes { display:flex; align-items:flex-end; justify-content:center; gap:6px; height:110px; margin-bottom:30px; }
+.empty-volumes i { width:23px; height:85px; background:#a4a99c22; border:1px solid #a4a99c55; border-radius:2px; }
+.empty-volumes i:nth-child(2) { height:100px; width:29px; }
+.empty-volumes i:last-child { transform:rotate(-7deg); height:78px; }
+.reader-current { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:25px 0; border-block:1px solid var(--color-rule); }
+.reader-filters { display:flex; gap:16px; }
+.reader-filters label:first-child { flex:1; min-width:0; }
+.reader-filters input,.reader-filters select { width:100%; min-height:44px; padding:10px 0; background:transparent; border-bottom:1px solid var(--color-rule); font-size:16px; }
+.reader-filters select { max-width:140px; }
+.reader-tabs { display:flex; gap:20px; padding:18px 0; overflow-x:auto; white-space:nowrap; }
+.reader-tabs button { font-size:14px; padding:5px 0; border-bottom:1px solid transparent; color:var(--color-ink-3); }
+.reader-tabs button[aria-pressed=true] { color:var(--color-ink); border-color:var(--color-ink); }
+.reader-tabs span { font-size:11px; margin-left:3px; }
+.shelf-pagination { display:flex; align-items:center; justify-content:space-between; font-size:13px; color:var(--color-ink-2); padding-top:8px; }
+.shelf-pagination > div { display:flex; align-items:center; gap:18px; }
+.shelf-pagination button { min-width:44px; min-height:44px; font-size:20px; }
+.shelf-pagination button:disabled { opacity:.25; cursor:default; }
+.preview-banner { display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:10px 22px; padding:12px 20px; background:#353d37; color:#fff; font-size:12px; position:relative; z-index:41; }
+.preview-banner a,.preview-banner button { text-decoration:underline; text-underline-offset:3px; min-height:30px; }
+.creator-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:25px; }
+.creator-grid section { border:1px solid var(--color-rule); padding:28px; }
+.creator-grid h2 { font-size:24px; margin:12px 0; }
+.creator-grid p { font-size:14px; line-height:1.7; color:var(--color-ink-2); }
+.reader-dialog { position:fixed; margin:auto; width:min(520px,calc(100vw - 28px)); max-height:90dvh; overflow-y:auto; background:var(--color-paper); color:var(--color-ink); padding:28px; border:1px solid var(--color-rule); border-radius:8px; box-shadow:0 25px 80px #0003; }
+.reader-dialog::backdrop { background:#1e1a1660; }
+.reader-close { min-width:44px; min-height:44px; }
+.reader-form { display:flex; flex-direction:column; gap:17px; }
+.reader-form label { display:flex; flex-direction:column; gap:7px; font-size:13px; }
+.reader-form input,.reader-form select,.reader-form textarea { width:100%; background:#fff5; border:1px solid var(--color-rule); padding:11px; min-height:44px; border-radius:3px; font-size:16px; }
+.reader-form input:focus,.reader-form select:focus,.reader-form textarea:focus { outline:1px solid var(--color-ink-2); }
+.reader-form input:disabled { opacity:.4; }
+.reader-error { padding:12px; background:#b2302310; color:#8b3026; font-size:13px; line-height:1.7; }
+@media(max-width:600px) { .creator-grid { grid-template-columns:1fr; } .reader-dialog { padding:22px; } .reader-current { align-items:flex-start; flex-direction:column; } }

@@ -1,4 +1,8 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
+import { BRAND } from "@/lib/brand";
+import WorkspaceProvider from "@/components/workspace/WorkspaceProvider";
+import Experience from "@/components/workspace/Experience";
 import Nav from "@/components/Nav";
 import "./globals.css";
 
@@ -9,11 +13,11 @@ const fontsUrl =
   "https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Serif+KR:wght@400;500;600&display=swap";
 
 export const metadata: Metadata = {
-  title: "다시, 책",
-  description: "읽던 책으로 자연스럽게 다시 돌아오는 개인 독서 공간",
+  title: BRAND.name,
+  description: BRAND.description,
   appleWebApp: {
     capable: true,
-    title: "다시, 책",
+    title: BRAND.name,
     statusBarStyle: "default",
   },
 };
@@ -33,8 +37,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="stylesheet" href={fontsUrl} />
       </head>
       <body className="min-h-dvh font-sans antialiased">
-        <Nav />
-        <main className="relative pb-28 md:pb-0">{children}</main>
+        <WorkspaceProvider>
+          <Nav />
+          <main className="relative pb-28 md:pb-0"><Suspense fallback={<div className="wrap py-20">서재 여는 중</div>}><Experience>{children}</Experience></Suspense></main>
+        </WorkspaceProvider>
       </body>
     </html>
   );

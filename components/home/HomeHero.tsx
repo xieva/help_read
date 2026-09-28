@@ -2,6 +2,7 @@
 // 홈의 첫 장면: 스탠드 불빛 아래 펼쳐 둔 책 한 권
 // 스크롤하면 책이 아주 천천히 뒤로 물러나고, 불빛이 조금씩 옅어집니다.
 
+import { BRAND } from "@/lib/brand";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import Link from "next/link";
 import { useRef, useState } from "react";
@@ -39,10 +40,10 @@ export default function HomeHero({ book, segments, chapterLabel, returnLine, res
     <section className="relative overflow-x-clip">
       <div className="wrap pt-[max(20px,env(safe-area-inset-top))] md:pt-4">
         <div className="flex items-center justify-between md:hidden">
-          <span className="font-serif text-[17px] tracking-[-0.01em]">다시, 책</span>
+          <span className="font-serif text-[17px] tracking-[-0.01em]">{BRAND.name}</span>
           <DateLine />
         </div>
-        <DateLine className="hidden md:block" />
+        <DateLine className="hidden md:block md:text-right" />
         <h1 className="mt-7 font-serif text-[29px] leading-[1.3] font-medium tracking-[-0.01em] md:mt-5 md:text-[44px] md:leading-[1.2]">
           {returnLine}
           <br />

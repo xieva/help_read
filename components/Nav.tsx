@@ -1,6 +1,7 @@
 "use client";
 // 모바일: 아래쪽 탭 바 / 데스크톱: 위쪽 가로 메뉴
 
+import { BRAND } from "@/lib/brand";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -30,7 +31,7 @@ export default function Nav() {
       <header className="relative z-40 hidden md:block" style={{ viewTransitionName: "site-header" }}>
         <div className="wrap flex h-20 items-center justify-between">
           <Link href="/" className="font-serif text-[19px] tracking-[-0.01em] text-ink">
-            다시, 책
+            {BRAND.name}
           </Link>
           <nav className="flex items-center gap-10 text-[14px]">
             {items.map((item) => {

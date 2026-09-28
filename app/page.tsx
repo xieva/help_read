@@ -2,6 +2,7 @@
 // 대시보드가 아니라 "내 독서 세계"를 보여주는 화면입니다.
 // 위에서부터: 지금 읽는 책 → 오늘의 독서 → 함께 펼쳐 둔 책 → 최근 다 읽은 책 → 다음에 읽을 책 → 어울릴 책
 
+import { BRAND } from "@/lib/brand";
 import Link from "next/link";
 import BookCover from "@/components/book/BookCover";
 import BookMorph from "@/components/book/BookMorph";
@@ -229,7 +230,7 @@ export default function HomePage() {
       )}
 
       <footer className="wrap py-16 text-center text-[12px] leading-relaxed text-ink-4">
-        <p className="font-serif text-[14px] text-ink-3">다시, 책</p>
+        <p className="font-serif text-[14px] text-ink-3">{BRAND.name}</p>
         <p className="mt-1">읽던 곳으로 돌아오는 자리 · 지금 보이는 내용은 예시 데이터예요</p>
       </footer>
     </div>
