@@ -46,6 +46,8 @@ export default function BookViewer({ book, bookmark, morphId, className = "" }: 
   const rx = useMotionValue(0);
   const shift = useMotionValue(0); // 책 너비의 몇 %만큼 오른쪽으로 옮길지 (펼치면 50, 뒷면이면 100)
   const shiftX = useTransform(shift, (n) => `${n}%`);
+  // 도는 중심: 지금 눈에 보이는 책의 한가운데 (뒷면일 땐 종이가 왼쪽으로 넘어가 있어서 중심도 함께 옮겨요)
+  const pivot = useTransform(shift, (n) => `${50 - n}% 50%`);
   const [mode, setMode] = useState<Mode>("front");
   const [prev, setPrev] = useState<Mode>("front");
   const drag = useRef<{ x: number; start: number; moved: boolean; id: number; onMark: boolean } | null>(null);
@@ -156,7 +158,7 @@ export default function BookViewer({ book, bookmark, morphId, className = "" }: 
       style={{ "--t": `calc(var(--w) * ${thickness.toFixed(3)})` } as React.CSSProperties}
     >
       <div className="bv-shadow" aria-hidden />
-      <motion.div className="bv-body" style={{ rotateY: ry, rotateX: rx, x: shiftX }}>
+      <motion.div className="bv-body" style={{ rotateY: ry, rotateX: rx, x: shiftX, transformOrigin: pivot }}>
         {/* 책등: 가운데쯤 장과 함께 돌아요 */}
         <motion.div className="bv-spine-hinge" {...hinge(Math.ceil(LEAVES / 2))}>
           <div className="bv-spine" style={{ background: `color-mix(in oklab, ${book.cover.bg} 78%, black)` }} />

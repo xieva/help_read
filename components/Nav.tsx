@@ -9,6 +9,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthProvider";
 import DateLine from "@/components/home/DateLine";
 import { BRAND } from "@/lib/brand";
+import BrandMark from "@/components/brand/BrandMark";
 
 function isActive(pathname: string, href: string) {
   const path = pathname.replace(/\/$/, "") || "/";
@@ -39,7 +40,8 @@ export default function Nav() {
       {/* 데스크톱 상단 */}
       <header className="relative z-40 hidden md:block" style={{ viewTransitionName: "site-header" }}>
         <div className="wrap flex h-20 items-center justify-between">
-          <Link href="/" className="font-serif text-[19px] tracking-[-0.01em] text-ink">
+          <Link href="/" className="flex items-center gap-2.5 font-serif text-[19px] tracking-[-0.01em] text-ink">
+            <BrandMark size={24} />
             {BRAND.name}
           </Link>
           <nav className="flex items-center gap-9 text-[14px]">

@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { BookStatus } from "@/data/books";
 import { BRAND } from "@/lib/brand";
+import BrandMark from "@/components/brand/BrandMark";
 import { makeBook, validateInput, type BookInput, type PersonalBook } from "@/lib/user-library";
 import { useAuth } from "@/components/auth/AuthProvider";
 import BookCover from "@/components/book/BookCover";
@@ -83,7 +84,8 @@ export default function UserWorkspace({ section }: { section: string }) {
 
   const header = (
     <header className="flex items-center justify-between md:hidden">
-      <Link href="/" className="font-serif text-[18px] tracking-tight">
+      <Link href="/" className="flex items-center gap-2 font-serif text-[18px] tracking-tight">
+        <BrandMark size={22} />
         {BRAND.name}
       </Link>
       <DateLine />

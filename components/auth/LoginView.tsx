@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { BRAND } from "@/lib/brand";
+import BrandMark from "@/components/brand/BrandMark";
 import { useAuth } from "./AuthProvider";
 
 export default function LoginView() {
@@ -41,7 +42,8 @@ export default function LoginView() {
   return (
     <div className="wrap flex min-h-[80dvh] flex-col justify-center py-12">
       <div className="mx-auto w-full max-w-[400px]">
-        <Link href="/" className="font-serif text-[22px]">
+        <Link href="/" className="inline-flex items-center gap-2.5 font-serif text-[22px]">
+          <BrandMark size={28} />
           {BRAND.name}
         </Link>
         <h1 className="mt-8 text-[28px] font-semibold tracking-[-0.02em]">

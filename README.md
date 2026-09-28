@@ -69,7 +69,8 @@ npm run dev
 - **서재** (편집숍 서가): 카테고리 하나 = 책장 하나, 좌우로 넘겨요. 책을 한 번 누르면 옆 책들이 비켜나며 표지 쪽으로 돌아 나오고, 한 번 더 누르면 열려요.
   `components/book/BookstoreShelf.tsx`, 스타일은 `app/bookstore.css`.
 - **책 상세**: 책을 밀면 돌아가고, 누르면 종이가 끝까지 넘어가 **뒷면**이 나와요. 위로 나온 **책갈피**를 누르면 읽던 쪽이 펼쳐져요.
-  책갈피 무늬(밤하늘·잔디·바다·노을·벚꽃·눈)는 책마다 고를 수 있어요. `components/book/BookViewer.tsx`, `components/book/Bookmark.tsx`.
+  화면 왼쪽 가장자리의 책갈피를 오른쪽으로 당기면 **책 설정** 서랍이 나와요. 여기서 책갈피 무늬(밤하늘·잔디·바다·노을·벚꽃·눈)를 책마다 고를 수 있고, 설정은 `components/book/BookSettings.tsx`에 항목을 추가해 늘려요.
+  `components/book/BookViewer.tsx`, `components/book/Bookmark.tsx`, `components/ui/PullDrawer.tsx`.
 - **앞·뒤 표지 이미지**: 책 데이터의 `coverImage`(앞), `coverBackImage`(뒤)에 이미지 주소를 넣으면 그림 대신 이미지가 보여요.
 - **테마**: 설정에서 서점의 밤(기본)·종이·숲속 서재·새벽 중에 고를 수 있어요. 색은 `app/themes.css`, 목록은 `lib/theme.ts`.
-- 브랜드 이름은 `lib/brand.ts` 에서 한 번에 바꿔요.
+- 브랜드 이름은 `lib/brand.ts` 에서 한 번에 바꿔요. 앱 아이콘(책갈피 + r)은 `app/icon.svg`, `app/apple-icon.png`, `components/brand/BrandMark.tsx`.
