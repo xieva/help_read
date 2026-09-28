@@ -1,13 +1,11 @@
 "use client";
 // 모바일: 아래쪽 탭 바 / 데스크톱: 위쪽 가로 메뉴
-// - 로그인 전: 네 번째 탭이 "로그인"
-// - 회원: "내 정보" / 어드민: "제작"
-// - 서재 화면에서는 매장처럼 어두운 톤으로 바뀌어요 (html[data-theme="store"])
+// - 네 번째 탭: "설정"(테마·계정) / 어드민은 "제작"
+// - 색은 설정에서 고른 테마를 따라요 (components/theme)
 
 import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import DateLine from "@/components/home/DateLine";
 import { BRAND } from "@/lib/brand";
@@ -24,23 +22,11 @@ export default function Nav() {
   const router = useRouter();
   const { user, view, setView, signOut } = useAuth();
   const path = pathname.replace(/\/$/, "") || "/";
-  const store = path === "/library";
-
-  // 서재에서는 어두운 매장 톤 + 아이폰 상단 색도 맞춰요
-  useEffect(() => {
-    const html = document.documentElement;
-    if (store) html.dataset.theme = "store";
-    else delete html.dataset.theme;
-    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", store ? "#1c201e" : "#f4efe7");
-  }, [store]);
 
   if (path.endsWith("/read") || path === "/login") return null;
 
-  const account = !user
-    ? { href: "/login", label: "로그인" }
-    : user.role === "admin"
-      ? { href: "/creator", label: "제작" }
-      : { href: "/account", label: "내 정보" };
+  // 네 번째 탭: 어드민은 "제작", 나머지는 "설정"(테마 · 계정)
+  const account = user?.role === "admin" ? { href: "/creator", label: "제작" } : { href: "/account", label: "설정" };
   const items = [
     { href: "/", label: "오늘" },
     { href: "/library", label: "서재" },
@@ -94,11 +80,12 @@ export default function Nav() {
                 ))}
               </div>
             )}
+            <Link href="/account" className={isActive(pathname, "/account") ? "text-ink" : "text-ink-3 hover:text-ink"}>
+              설정
+            </Link>
             {user ? (
               <>
-                <Link href="/account" className="text-ink-2 hover:text-ink">
-                  {user.name}
-                </Link>
+                <span className="text-ink-2">{user.name}</span>
                 <button
                   onClick={() => {
                     signOut();

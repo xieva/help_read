@@ -38,12 +38,12 @@ export default function LibraryPage() {
   const finishedThisYear = items.filter((i) => i.book.status === "finished" && i.year === thisYear).length;
 
   return (
-    <div className="wrap pt-4 md:pt-10">
-      <header>
-        <h1 className="font-serif text-[30px] leading-none font-medium tracking-[-0.02em] md:text-[56px]">서재</h1>
-        <p className="mt-2 text-[13px] text-ink-3 md:mt-4 md:text-[14px]">
-          <span className="numeral text-ink-2">{getAllBooks().length}</span>권의 책 · 올해{" "}
-          <span className="numeral text-ink-2">{finishedThisYear}</span>권을 끝까지 읽었어요
+    <div className="wrap pt-4 md:pt-4">
+      <header className="flex items-baseline justify-between gap-4">
+        <h1 className="font-serif text-[26px] leading-none font-medium tracking-[-0.02em] md:text-[40px]">서재</h1>
+        <p className="text-[12.5px] text-ink-3 md:text-[14px]">
+          <span className="numeral text-ink-2">{getAllBooks().length}</span>권 · 올해{" "}
+          <span className="numeral text-ink-2">{finishedThisYear}</span>권 다 읽음
         </p>
       </header>
       <Suspense>

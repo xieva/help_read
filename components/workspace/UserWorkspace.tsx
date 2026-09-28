@@ -10,9 +10,10 @@ import { BRAND } from "@/lib/brand";
 import { makeBook, validateInput, type BookInput, type PersonalBook } from "@/lib/user-library";
 import { useAuth } from "@/components/auth/AuthProvider";
 import BookCover from "@/components/book/BookCover";
-import BookViewer from "@/components/book/BookViewer";
+import BookStage from "@/components/book/BookStage";
 import BookstoreShelf, { type ShelfBook } from "@/components/book/BookstoreShelf";
 import DateLine from "@/components/home/DateLine";
+import ShelfToolbar from "@/components/library/ShelfToolbar";
 import { useWorkspace } from "./WorkspaceProvider";
 
 const statuses: Record<BookStatus, string> = { reading: "읽는 중", want: "읽고 싶은", finished: "다 읽은" };
@@ -117,9 +118,9 @@ export default function UserWorkspace({ section }: { section: string }) {
           <span className="eyebrow">{statuses[b.status]}</span>
         </div>
         <div className="md:grid md:grid-cols-12 md:items-center md:gap-12">
-          <div className="relative flex h-[380px] items-center justify-center overflow-x-clip md:col-span-6 md:h-[560px]">
-            <div aria-hidden className="lamp pointer-events-none absolute top-1/2 left-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2" />
-            <BookViewer book={b} className="[--w:168px] md:[--w:240px]" />
+          <div className="relative flex flex-col items-center justify-center overflow-x-clip pt-10 pb-8 md:col-span-6 md:py-12">
+            <div aria-hidden className="lamp pointer-events-none absolute top-[42%] left-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2" />
+            <BookStage book={b} className="[--w:164px] md:[--w:220px]" />
           </div>
           <div className="md:col-span-6">
             <p className="eyebrow">{b.genre}</p>
@@ -158,23 +159,35 @@ export default function UserWorkspace({ section }: { section: string }) {
     );
   }
 
+  const library = section === "/library";
+
   return (
     <div className="wrap py-5 md:py-8">
-      {header}
-      <div className={`flex items-end justify-between gap-5 md:mt-2 ${home || discover ? "mt-8" : "mt-4"}`}>
-        <div>
-          <p className="eyebrow">{user ? `${user.name}님의 ${home ? "오늘" : discover ? "다음 책" : "서재"}` : ""}</p>
-          <h1
-            className={`mt-1 font-medium tracking-tight md:mt-2 md:text-[42px] ${home || discover ? "text-[32px]" : "text-[26px]"}`}
-          >
-            {home ? "오늘의 책" : discover ? "다음 책" : "내 서재"}
+      {!library && header}
+      {library ? (
+        // 서재: 책장이 한 화면에 들어오도록 머리말을 한 줄로
+        <div className="flex items-center justify-between gap-4 md:mt-2">
+          <h1 className="font-serif text-[26px] leading-none font-medium tracking-[-0.02em] md:text-[40px]">
+            {user ? `${user.name}님의 서재` : "내 서재"}
           </h1>
+          <button className="reader-button is-small press" onClick={() => setAdding(true)}>
+            + 책 추가
+          </button>
         </div>
-        <button className="reader-button press" onClick={() => setAdding(true)}>
-          + 책 추가
-        </button>
-      </div>
-      <p role="status" className={`text-sm text-ink-2 ${notice ? "mt-3 min-h-5" : "mt-1"}`}>
+      ) : (
+        <div className="mt-8 flex items-end justify-between gap-5 md:mt-2">
+          <div>
+            <p className="eyebrow">{user ? `${user.name}님의 ${home ? "오늘" : "다음 책"}` : ""}</p>
+            <h1 className="mt-1 text-[32px] font-medium tracking-tight md:mt-2 md:text-[42px]">
+              {home ? "오늘의 책" : "다음 책"}
+            </h1>
+          </div>
+          <button className="reader-button press" onClick={() => setAdding(true)}>
+            + 책 추가
+          </button>
+        </div>
+      )}
+      <p role="status" className={`text-sm text-ink-2 ${notice ? "mt-2 min-h-5" : ""}`}>
         {notice}
       </p>
       {error && (
@@ -250,32 +263,34 @@ export default function UserWorkspace({ section }: { section: string }) {
           </section>
         </>
       ) : (
-        <section aria-label="내 책 목록">
-          <div className="reader-filters">
-            <label>
-              <span className="sr-only">내 책 검색</span>
-              <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="제목, 저자 검색" />
-            </label>
-            <label>
-              <span className="sr-only">분류</span>
-              <select value={genre} onChange={(e) => setGenre(e.target.value)}>
+        <section aria-label="내 책 목록" className="mt-2">
+          <ShelfToolbar
+            tabs={[
+              { key: "all", label: "전체", count: books.length },
+              ...(Object.keys(statuses) as BookStatus[]).map((key) => ({
+                key,
+                label: statuses[key],
+                count: books.filter((b) => b.status === key).length,
+              })),
+            ]}
+            active={filter}
+            onTab={(key) => setFilter(key as BookStatus | "all")}
+            query={query}
+            onQuery={setQuery}
+            extra={
+              <select
+                aria-label="분류"
+                value={genre}
+                onChange={(e) => setGenre(e.target.value)}
+                className="h-10 max-w-[96px] shrink-0 border-b border-rule bg-transparent text-[14px] outline-none"
+              >
                 <option value="all">모든 분류</option>
                 {[...new Set(books.map((b) => b.genre))].map((g) => (
                   <option key={g}>{g}</option>
                 ))}
               </select>
-            </label>
-          </div>
-          <div className="reader-tabs" role="group" aria-label="독서 상태 필터">
-            <button aria-pressed={filter === "all"} onClick={() => setFilter("all")}>
-              전체 <span>{books.length}</span>
-            </button>
-            {(Object.keys(statuses) as BookStatus[]).map((key) => (
-              <button key={key} aria-pressed={filter === key} onClick={() => setFilter(key)}>
-                {statuses[key]} <span>{books.filter((b) => b.status === key).length}</span>
-              </button>
-            ))}
-          </div>
+            }
+          />
           {filtered.length ? (
             <BookstoreShelf books={filtered.map(toShelf)} onAdd={() => setAdding(true)} />
           ) : (

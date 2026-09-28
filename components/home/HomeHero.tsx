@@ -43,7 +43,6 @@ export default function HomeHero({ book, segments, chapterLabel, returnLine, res
           <span className="font-serif text-[17px] tracking-[-0.01em]">{BRAND.name}</span>
           <DateLine />
         </div>
-        <DateLine className="hidden md:block md:text-right" />
         <h1 className="mt-7 font-serif text-[29px] leading-[1.3] font-medium tracking-[-0.01em] md:mt-5 md:text-[44px] md:leading-[1.2]">
           {returnLine}
           <br />

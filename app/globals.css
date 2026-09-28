@@ -307,12 +307,13 @@ body::before {
 }
 
 /* 스탠드 불빛 */
+/* 스탠드 불빛 (테마마다 색과 세기가 달라요: themes.css 의 --lamp, --lamp-a) */
 .lamp {
   background: radial-gradient(
     closest-side,
-    rgba(255, 250, 240, 1) 0%,
-    rgba(255, 248, 236, 0.75) 38%,
-    rgba(255, 248, 236, 0) 100%
+    rgb(var(--lamp) / calc(1 * var(--lamp-a))) 0%,
+    rgb(var(--lamp) / calc(0.75 * var(--lamp-a))) 38%,
+    rgb(var(--lamp) / 0) 100%
   );
 }
 
@@ -416,6 +417,7 @@ body::before {
 
 /* Functional workspace UI; full art direction awaits design approval. */
 .reader-button { display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:11px 20px; background:var(--color-ink); color:var(--color-paper); border:1px solid var(--color-ink); border-radius:4px; font-size:14px; cursor:pointer; }
+.reader-button.is-small { min-height:38px; padding:7px 14px; font-size:13px; }
 .reader-button.secondary { background:transparent; color:var(--color-ink); border-color:var(--color-rule); }
 .reader-button:focus-visible, .reader-close:focus-visible { outline:2px solid var(--color-accent); outline-offset:4px; }
 .reader-empty { padding:45px 20px 60px; text-align:center; border-block:1px solid var(--color-rule); margin-top:16px; }
@@ -448,7 +450,7 @@ body::before {
 .reader-close { min-width:44px; min-height:44px; }
 .reader-form { display:flex; flex-direction:column; gap:17px; }
 .reader-form label { display:flex; flex-direction:column; gap:7px; font-size:13px; }
-.reader-form input,.reader-form select,.reader-form textarea { width:100%; background:#fff5; border:1px solid var(--color-rule); padding:11px; min-height:44px; border-radius:3px; font-size:16px; }
+.reader-form input,.reader-form select,.reader-form textarea { width:100%; background:color-mix(in oklab, var(--color-ink) 4%, transparent); color:var(--color-ink); border:1px solid var(--color-rule); padding:11px; min-height:44px; border-radius:3px; font-size:16px; }
 .reader-form input:focus,.reader-form select:focus,.reader-form textarea:focus { outline:1px solid var(--color-ink-2); }
 .reader-form input:disabled { opacity:.4; }
 .reader-error { padding:12px; background:#b2302310; color:#8b3026; font-size:13px; line-height:1.7; }

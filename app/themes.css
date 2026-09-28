@@ -1,0 +1,118 @@
+/*
+  ─────────────────────────────────────────────────────────────
+  테마 색
+  html 에 data-theme="night" 처럼 붙으면 그 테마의 색으로 바뀌어요.
+  - 화면 색: --color-paper(바탕), --color-ink(글자), --color-accent(포인트) …
+  - 책장 색: --case-* (책장 판), --light (선반 조명 색, "R G B"), --light-a (조명 세기)
+  - 스탠드 불빛: --lamp ("R G B"), --lamp-a (세기)
+  "종이" 테마는 globals.css 의 기본값을 그대로 써요.
+  ─────────────────────────────────────────────────────────────
+*/
+
+:root {
+  --lamp: 255 250 240;
+  --lamp-a: 1;
+  /* 종이 테마의 책장: 월넛 */
+  --case-back: #2a2019;
+  --case-back-2: #261d16;
+  --case-post: #3d2e23;
+  --case-post-hi: #5a4535;
+  --case-board-top: #6e5341;
+  --case-board-front: #3f2f24;
+  --case-crown: #33271e;
+  --plate-bg: linear-gradient(#d4b47a, #a8844b);
+  --plate-ink: #2b2015;
+  --light: 255 200 128;
+  --light-a: 0.46;
+}
+
+/* 서점의 밤 (기본) */
+html[data-theme="night"] {
+  --color-paper: #1c201e;
+  --color-paper-2: #242a27;
+  --color-paper-3: #2c332f;
+  --color-lamp: #2a2620;
+  --color-ink: #ece6da;
+  --color-ink-2: #c7bfb1;
+  --color-ink-3: #938a7d;
+  --color-ink-4: #686159;
+  --color-rule: #343a36;
+  --color-accent: #d49a62;
+  --color-accent-soft: #b07f55;
+  --lamp: 255 190 120;
+  --lamp-a: 0.13;
+  --case-back: #242a27;
+  --case-back-2: #222825;
+  --case-post: #3b423e;
+  --case-post-hi: #56605a;
+  --case-board-top: #6e7771;
+  --case-board-front: #3e4541;
+  --case-crown: #2f3532;
+  --plate-bg: linear-gradient(#cfae72, #a9854a);
+  --plate-ink: #2b2015;
+  --light: 255 206 138;
+  --light-a: 0.42;
+}
+
+/* 숲속 서재 */
+html[data-theme="forest"] {
+  --color-paper: #17201b;
+  --color-paper-2: #1f2a23;
+  --color-paper-3: #27332b;
+  --color-lamp: #232a1f;
+  --color-ink: #e4eadc;
+  --color-ink-2: #bfc9b5;
+  --color-ink-3: #8b977f;
+  --color-ink-4: #5f6b57;
+  --color-rule: #2e3a31;
+  --color-accent: #c2cc8f;
+  --color-accent-soft: #93a06a;
+  --lamp: 225 222 160;
+  --lamp-a: 0.11;
+  --case-back: #1f2b22;
+  --case-back-2: #1d2820;
+  --case-post: #3b4b3c;
+  --case-post-hi: #56695a;
+  --case-board-top: #6f7d5c;
+  --case-board-front: #3b4a37;
+  --case-crown: #2a3629;
+  --plate-bg: linear-gradient(#d8d2a6, #a8a47a);
+  --plate-ink: #1f2a1e;
+  --light: 246 222 158;
+  --light-a: 0.4;
+}
+
+/* 새벽 */
+html[data-theme="dawn"] {
+  --color-paper: #181c24;
+  --color-paper-2: #20252f;
+  --color-paper-3: #282e3a;
+  --color-lamp: #232838;
+  --color-ink: #e3e7ef;
+  --color-ink-2: #bcc3d1;
+  --color-ink-3: #8791a3;
+  --color-ink-4: #5d6576;
+  --color-rule: #2c3240;
+  --color-accent: #a9bde0;
+  --color-accent-soft: #7f93b8;
+  --lamp: 170 190 235;
+  --lamp-a: 0.12;
+  --case-back: #222834;
+  --case-back-2: #20252f;
+  --case-post: #3a4150;
+  --case-post-hi: #566074;
+  --case-board-top: #6a7488;
+  --case-board-front: #3a4252;
+  --case-crown: #2b313d;
+  --plate-bg: linear-gradient(#d9dfea, #a7b1c4);
+  --plate-ink: #1d2330;
+  --light: 214 226 255;
+  --light-a: 0.34;
+}
+
+/* 어두운 테마에서는 종이 결을 더 옅게 */
+html[data-theme="night"] body::before,
+html[data-theme="forest"] body::before,
+html[data-theme="dawn"] body::before {
+  opacity: 0.22;
+}

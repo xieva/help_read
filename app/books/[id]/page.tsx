@@ -3,9 +3,8 @@
 
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import BookViewer from "@/components/book/BookViewer";
+import BookStage from "@/components/book/BookStage";
 import BookCover from "@/components/book/BookCover";
-import BookMorph from "@/components/book/BookMorph";
 import ChapterMap from "@/components/book/ChapterMap";
 import { AskButton, AssistantProvider, AssistantSuggestions } from "@/components/detail/Assistant";
 import Memos from "@/components/detail/Memos";
@@ -76,16 +75,12 @@ export default async function BookPage({ params }: { params: Promise<{ id: strin
           <div className="md:grid md:grid-cols-12 md:gap-12 lg:gap-16">
             {/* 왼쪽: 책 */}
             <div className="md:col-span-5">
-              <div className="relative flex h-[390px] items-center justify-center md:sticky md:top-6 md:h-[calc(100svh-120px)] md:max-h-[720px]">
+              <div className="relative flex flex-col items-center justify-center pt-12 pb-8 md:sticky md:top-6 md:min-h-[calc(100svh-120px)] md:py-10">
                 <div
                   aria-hidden
-                  className="lamp pointer-events-none absolute top-1/2 left-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 md:h-[780px] md:w-[780px]"
+                  className="lamp pointer-events-none absolute top-[42%] left-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 md:h-[780px] md:w-[780px]"
                 />
-                <BookMorph id={book.id}>
-                  <div>
-                    <BookViewer book={book} className="[--w:164px] md:[--w:190px] lg:[--w:215px]" />
-                  </div>
-                </BookMorph>
+                <BookStage book={book} className="[--w:164px] md:[--w:190px] lg:[--w:215px]" />
               </div>
             </div>
 

@@ -93,6 +93,9 @@ export default function CreatorDashboard() {
             <button className="reader-button press" onClick={() => switchTo("user")}>
               사용자 화면으로
             </button>
+            <Link href="/account" className="reader-button secondary press">
+              설정 · 테마
+            </Link>
             <button
               className="reader-button secondary press"
               onClick={() => {

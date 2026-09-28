@@ -64,8 +64,12 @@ npm run dev
 - 계정과 서재는 **이 브라우저에만** 저장돼요 (비밀번호는 해시로 저장). 진짜 보안·다른 기기 로그인은 서버(Supabase 등) 연결 후 가능해요.
   나중에 바꿀 곳: `lib/auth.ts`(계정), `components/workspace/WorkspaceProvider.tsx`(서재 저장).
 
-## 서재 · 책 상세
+## 서재 · 책 상세 · 테마
 
-- 서재는 편집숍 서가(디자인 C): 카테고리 하나 = 책장 하나, 좌우로 넘겨요. `components/book/BookstoreShelf.tsx`, 스타일은 `app/bookstore.css`.
-- 책 상세의 책은 좌우로 밀면 돌아가고, 누르면 펼쳐지며 종이가 넘어가요. `components/book/BookViewer.tsx`.
+- **서재** (편집숍 서가): 카테고리 하나 = 책장 하나, 좌우로 넘겨요. 책을 한 번 누르면 옆 책들이 비켜나며 표지 쪽으로 돌아 나오고, 한 번 더 누르면 열려요.
+  `components/book/BookstoreShelf.tsx`, 스타일은 `app/bookstore.css`.
+- **책 상세**: 책을 밀면 돌아가고, 누르면 종이가 끝까지 넘어가 **뒷면**이 나와요. 위로 나온 **책갈피**를 누르면 읽던 쪽이 펼쳐져요.
+  책갈피 무늬(밤하늘·잔디·바다·노을·벚꽃·눈)는 책마다 고를 수 있어요. `components/book/BookViewer.tsx`, `components/book/Bookmark.tsx`.
+- **앞·뒤 표지 이미지**: 책 데이터의 `coverImage`(앞), `coverBackImage`(뒤)에 이미지 주소를 넣으면 그림 대신 이미지가 보여요.
+- **테마**: 설정에서 서점의 밤(기본)·종이·숲속 서재·새벽 중에 고를 수 있어요. 색은 `app/themes.css`, 목록은 `lib/theme.ts`.
 - 브랜드 이름은 `lib/brand.ts` 에서 한 번에 바꿔요.

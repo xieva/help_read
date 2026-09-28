@@ -53,6 +53,7 @@ export type Book = {
   addedReason?: string; // 읽고 싶은 책: 왜 담아두었는지
   cover: Cover;
   coverImage?: string; // 나중에 실제 표지 이미지 주소를 넣을 자리
+  coverBackImage?: string; // 뒤표지 이미지 주소 (나중에 AI로 만든 앞·뒤 표지를 넣을 자리)
   chapters?: Chapter[];
   memos?: Memo[];
 };

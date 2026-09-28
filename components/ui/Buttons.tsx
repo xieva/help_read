@@ -17,7 +17,7 @@ type PrimaryProps = {
 
 export function PrimaryLink({ href, children, sub, className = "", tone = "ink", gated = false }: PrimaryProps) {
   const { gate } = useAuth();
-  const colors = tone === "night" ? "bg-night-ink text-night hover:bg-white" : "bg-ink text-paper hover:bg-[#2b251f]";
+  const colors = tone === "night" ? "bg-night-ink text-night hover:bg-white" : "bg-ink text-paper hover:opacity-90";
   return (
     <Link
       href={href}

@@ -27,7 +27,7 @@ export default function StartReading({ title }: { title: string }) {
             key="start"
             exit={{ opacity: 0, y: -6 }}
             onClick={() => gate(() => setStarted(true))}
-            className="press inline-flex h-[54px] w-full items-center justify-center rounded-[14px] bg-ink px-8 text-[15.5px] font-medium text-paper hover:bg-[#2b251f] sm:w-auto"
+            className="press inline-flex h-[54px] w-full items-center justify-center rounded-[14px] bg-ink px-8 text-[15.5px] font-medium text-paper hover:opacity-90 sm:w-auto"
           >
             읽기 시작하기
           </motion.button>
