@@ -1,0 +1,1279 @@
+/*
+  ─────────────────────────────────────────────────────────────
+  편집숍 서가 (디자인 C)
+  - 책장: 위쪽 관(이름판) + 선반 4칸 + 아래 받침. 색은 테마(themes.css 의 --case-*)를 따라요.
+  - 선반마다 위에서 떨어지는 조명 (--light, --light-a)
+  - 책: 진짜 3D (표지 · 책등 · 윗면 · 종이 면). 위에서 살짝 내려다보는 원근이라 윗면이 보여요.
+  ─────────────────────────────────────────────────────────────
+*/
+
+.bs-store {
+  --bay-w: 348px;
+  --shelf-h: 126px;
+  --k: 0.96; /* 책 크기 배율 */
+  color: #e9e4d8;
+}
+@media (max-width: 767px) {
+  .bs-store {
+    --bay-w: min(348px, calc(100vw - 58px));
+    --shelf-h: 118px;
+    --k: 0.88;
+  }
+}
+@media (max-width: 359px) {
+  .bs-store {
+    --shelf-h: 104px;
+    --k: 0.76;
+  }
+}
+
+/* 책장들: 좌우로 넘겨요 (한 칸씩 딱 멈춤) */
+.bs-scroller {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  margin-inline: -22px;
+  padding: 6px 22px 4px;
+  scroll-padding-inline: 22px;
+}
+@media (min-width: 768px) {
+  .bs-scroller {
+    margin-inline: 0;
+    padding-inline: 0;
+    scroll-padding-inline: 0;
+  }
+}
+
+/* ── 책장 한 칸 (원목) ─────────────────────────────────────── */
+/* 나뭇결은 app/wood.css, 나무 색은 themes.css 의 --case-* */
+.bs-bay {
+  --post: 11px; /* 옆판 두께 */
+  position: relative;
+  flex: 0 0 var(--bay-w);
+  scroll-snap-align: start;
+  padding-inline: var(--post);
+  /* 뒤판: 세로로 이어 붙인 널빤지 + 양옆으로 갈수록 어두워지는 그늘 */
+  background:
+    linear-gradient(90deg, rgb(var(--case-shade) / 0.6), transparent 16%, transparent 84%, rgb(var(--case-shade) / 0.6)),
+    repeating-linear-gradient(90deg, transparent 0 calc(25% - 1.5px), rgb(var(--case-shade) / 0.5) calc(25% - 1.5px) calc(25% - 0.5px), rgb(255 230 200 / 0.05) calc(25% - 0.5px) 25%),
+    var(--wood-v),
+    var(--case-back);
+  box-shadow: 0 30px 50px -28px rgb(var(--case-shade) / 0.95);
+}
+/* 옆판 (왼쪽 · 오른쪽): 세로 결, 앞 모서리에 빛 */
+.bs-bay::before,
+.bs-bay::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--post);
+  z-index: 5;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgb(255 236 210 / 0.26) 0 1px, rgb(255 236 210 / 0.08) 1px 3px, transparent 3px, rgb(var(--case-shade) / 0.35)),
+    var(--wood-v),
+    var(--case-wood);
+}
+.bs-bay::before {
+  left: 0;
+}
+.bs-bay::after {
+  right: 0;
+  transform: scaleX(-1);
+  background-position: 0 0, -60px -200px, 0 0;
+}
+/* 위쪽 관: 몰딩이 있는 윗판 + 황동 이름판 */
+.bs-crown {
+  position: relative;
+  height: 32px;
+  margin-inline: calc(-1 * var(--post) - 5px);
+  background:
+    linear-gradient(
+      rgb(255 236 210 / 0.3) 0 1px,
+      rgb(255 236 210 / 0.06) 1px 5px,
+      rgb(var(--case-shade) / 0.35) 5px 6px,
+      transparent 6px calc(100% - 7px),
+      rgb(255 236 210 / 0.12) calc(100% - 7px) calc(100% - 6px),
+      rgb(var(--case-shade) / 0.55) calc(100% - 6px)
+    ),
+    var(--wood-h),
+    var(--case-wood);
+  border-radius: 3px 3px 1px 1px;
+  box-shadow: 0 7px 10px -6px rgb(var(--case-shade) / 0.9);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bs-plate {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: -1px;
+  padding: 3px 15px 2px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--plate-ink);
+  background: var(--plate-bg);
+  border-radius: 1.5px;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.45),
+    inset 0 -1px 0 rgb(0 0 0 / 0.2),
+    0 1px 2px rgb(0 0 0 / 0.5);
+  white-space: nowrap;
+}
+/* 이름판을 고정한 작은 나사 두 개 */
+.bs-plate::before,
+.bs-plate::after {
+  content: "";
+  position: absolute;
+  top: calc(50% - 1.5px);
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgb(255 255 255 / 0.5), rgb(0 0 0 / 0.45) 70%);
+}
+.bs-plate::before {
+  left: 5px;
+}
+.bs-plate::after {
+  right: 5px;
+}
+.bs-plate span {
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+}
+/* 아래 받침: 걸레받이처럼 살짝 들어간 판 */
+.bs-plinth {
+  height: 22px;
+  margin-inline: calc(-1 * var(--post) - 5px);
+  background:
+    linear-gradient(
+      rgb(255 236 210 / 0.26) 0 1px,
+      transparent 1px 7px,
+      rgb(var(--case-shade) / 0.5) 7px 9px,
+      rgb(var(--case-shade) / 0.18) 9px calc(100% - 4px),
+      rgb(var(--case-shade) / 0.6) calc(100% - 4px)
+    ),
+    var(--wood-h),
+    var(--case-wood);
+  background-position: 0 0, -220px -60px, 0 0;
+  border-radius: 1px 1px 3px 3px;
+  box-shadow: 0 12px 16px -8px rgb(var(--case-shade) / 0.95);
+  position: relative;
+  z-index: 6;
+}
+
+/* 선반 한 칸 */
+.bs-compartment {
+  position: relative;
+}
+.bs-shelf {
+  position: relative;
+  height: var(--shelf-h);
+  display: flex;
+  align-items: flex-end;
+  padding: 0 8px 0 10px;
+  overflow-x: clip; /* 꺼낸 책 때문에 옆으로 밀려도 책장 밖으로 넘치지 않게 (위로는 보이게) */
+}
+/* 황동 액자등과, 위에서 아래로 떨어지는 따뜻한 빛 */
+.bs-lamp {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  background:
+    radial-gradient(ellipse 52% 100% at 50% 0%, rgb(var(--light) / var(--light-a)), rgb(var(--light) / calc(var(--light-a) * 0.22)) 58%, transparent 84%),
+    linear-gradient(to bottom, transparent 58%, rgb(var(--case-shade) / 0.36));
+  mix-blend-mode: screen;
+}
+.bs-lamp::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 46px;
+  height: 6px;
+  margin-left: -23px;
+  border-radius: 0 0 5px 5px;
+  background: linear-gradient(#f0d59b, #b58a45 55%, #7a5a2a);
+  box-shadow:
+    0 1px 0 rgb(0 0 0 / 0.35),
+    0 3px 10px rgb(var(--light) / 0.55);
+}
+/* 선반 판: 빛 받는 앞 모서리 + 두께 있는 앞면 (가로 결) */
+.bs-board {
+  position: relative;
+  height: 13px;
+  background:
+    linear-gradient(
+      rgb(255 236 210 / 0.34) 0 1px,
+      rgb(255 236 210 / 0.12) 1px 4px,
+      rgb(var(--case-shade) / 0.22) 4px 5px,
+      transparent 5px 70%,
+      rgb(var(--case-shade) / 0.3)
+    ),
+    var(--wood-h2),
+    var(--case-board);
+  box-shadow: 0 7px 10px -5px rgb(var(--case-shade) / 0.85);
+  z-index: 2;
+}
+.bs-compartment:nth-child(3) .bs-board {
+  background-position: 0 0, -170px -46px, 0 0;
+}
+.bs-compartment:nth-child(4) .bs-board {
+  background-position: 0 0, -310px -92px, 0 0;
+}
+.bs-compartment:nth-child(5) .bs-board {
+  background-position: 0 0, -90px -130px, 0 0;
+}
+
+/* ── 책 (3D) ───────────────────────────────────────────────── */
+/* 자리: 책등 두께만큼. 꺼내면 표지 너비만큼 넓어져서 옆 책들이 비켜나요 */
+.bs-slot {
+  position: relative;
+  flex: 0 0 auto;
+  width: calc((var(--t) + 3px) * var(--k));
+  height: calc(var(--h) * var(--k));
+  perspective: 900px;
+  perspective-origin: 50% -45%; /* 위에서 살짝 내려다보기 → 윗면(종이)이 보여요 */
+  transition:
+    width 620ms var(--ease-book),
+    margin 620ms var(--ease-book);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.bs-slot.is-displayed {
+  width: calc((var(--bw) + 12px) * var(--k));
+  margin-right: 8px;
+}
+.bs-slot.is-selected {
+  width: calc((var(--bw) + 24px) * var(--k));
+  margin-inline: 4px;
+  z-index: 6;
+}
+.bs-slot:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+.bs-obj {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: calc(var(--bw) * var(--k));
+  height: calc(var(--h) * var(--k));
+  transform-style: preserve-3d;
+  transform-origin: center bottom;
+  transform: translateX(-50%) rotateY(88deg);
+  transition: transform 700ms var(--ease-book);
+}
+.bs-slot:not(.is-selected):not(.is-displayed):hover .bs-obj {
+  transform: translateX(-50%) translateY(-6px) rotateY(88deg);
+}
+.bs-slot.is-displayed .bs-obj {
+  transform: translateX(-50%) rotateY(18deg);
+}
+.bs-slot.is-displayed:not(.is-selected):hover .bs-obj {
+  transform: translateX(-50%) translateY(-5px) rotateY(12deg);
+}
+.bs-slot.is-selected .bs-obj {
+  transform: translateX(-50%) translateY(-10px) translateZ(36px) rotateY(12deg);
+}
+.bs-slot.is-entering .bs-obj {
+  transform: translateX(-50%) translateY(-24px) translateZ(120px) rotateY(0deg) scale(1.08);
+}
+.bs-f {
+  position: absolute;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.bs-f-front,
+.bs-f-back {
+  inset: 0;
+}
+.bs-f-front {
+  transform: translateZ(calc(var(--t) * var(--k) / 2));
+  box-shadow: 0 10px 16px -8px rgba(0, 0, 0, 0.7);
+}
+.bs-f-front .cover {
+  border-radius: 1px 3px 3px 1px;
+}
+.bs-f-back {
+  transform: rotateY(180deg) translateZ(calc(var(--t) * var(--k) / 2));
+  background: color-mix(in oklab, var(--bg) 85%, black);
+  border-radius: 3px 1px 1px 3px;
+}
+.bs-f-spine,
+.bs-f-pages {
+  top: 0;
+  height: 100%;
+  width: calc(var(--t) * var(--k));
+  left: calc(50% - var(--t) * var(--k) / 2);
+}
+.bs-f-spine {
+  transform: rotateY(-90deg) translateZ(calc(var(--bw) * var(--k) / 2));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(9px * var(--k)) 0 calc(8px * var(--k));
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  border-radius: 2px;
+}
+.bs-f-spine::after {
+  /* 둥근 책등의 명암 + 위쪽 조명 */
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.28), rgba(255, 255, 255, 0.1) 32%, rgba(255, 255, 255, 0.02) 62%, rgba(0, 0, 0, 0.26)),
+    linear-gradient(to bottom, rgba(255, 222, 170, 0.14), transparent 35%, rgba(0, 0, 0, 0.22));
+}
+.bs-f-pages {
+  top: 2px;
+  height: calc(100% - 4px);
+  transform: rotateY(90deg) translateZ(calc(var(--bw) * var(--k) / 2 - 2px));
+  background: repeating-linear-gradient(90deg, #f3ecde 0 1px, #dcd1bd 1px 2px);
+}
+/* 윗면: 표지 두 장 사이로 종이 묶음이 보여요 */
+.bs-f-top {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: calc(var(--t) * var(--k));
+  transform: translateY(-50%) rotateX(90deg);
+  background:
+    linear-gradient(to bottom, var(--bg) 0 1.5px, transparent 1.5px calc(100% - 1.5px), var(--bg) calc(100% - 1.5px)),
+    linear-gradient(90deg, var(--bg) 0 2px, transparent 2px),
+    repeating-linear-gradient(to bottom, #f5eedf 0 1px, #dfd3bd 1px 2px);
+}
+.bs-bands {
+  position: relative;
+  z-index: 1;
+  width: 70%;
+  height: 5px;
+  border-block: 1px solid currentColor;
+  opacity: 0.45;
+}
+.bs-title {
+  position: relative;
+  z-index: 1;
+  writing-mode: vertical-rl;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+.bs-author {
+  position: relative;
+  z-index: 1;
+  writing-mode: vertical-rl;
+  font-size: calc(7px * var(--k));
+  max-height: 28%;
+  overflow: hidden;
+  opacity: 0.65;
+  white-space: nowrap;
+}
+/* 읽는 중인 책의 가름끈 */
+.bs-ribbon {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 4px;
+  height: 20px;
+  margin-left: -2px;
+  background: #b0412f;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%);
+  z-index: 2;
+}
+.bs-face-label {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  color: #e9e4d8;
+  opacity: 0.72;
+}
+
+/* ── 빈자리 채우기: 진열용 책 · 북엔드 · 눕힌 책 · 화분 ──────── */
+/* 남은 폭만큼만 차지하고, 한 줄에 들어가지 않는 것은 통째로 다음 줄로 넘겨 숨겨요 (반쯤 잘린 책이 없게) */
+.bs-fill {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  overflow: hidden;
+  contain: size;
+  pointer-events: none;
+  transition: opacity 300ms;
+}
+.bs-cell {
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+  flex: 0 0 auto;
+}
+.bs-dummy {
+  position: relative;
+  display: block;
+  width: calc(var(--dw) * var(--k));
+  height: calc(var(--dh) * var(--k));
+  margin-right: 2px;
+  border-radius: 2px 2px 1px 1px;
+  background:
+    linear-gradient(to bottom, transparent 9%, rgb(255 255 255 / 0.12) 9% 10.5%, transparent 10.5% 86%, rgb(255 255 255 / 0.1) 86% 87.5%, transparent 87.5%),
+    linear-gradient(90deg, rgb(0 0 0 / 0.3), rgb(255 255 255 / 0.1) 35%, rgb(255 255 255 / 0.02) 65%, rgb(0 0 0 / 0.28)),
+    var(--dc);
+  opacity: 0.5;
+  filter: saturate(0.7);
+}
+/* 한 무리의 마지막 책은 비스듬히 기대요 */
+.bs-dummy.is-leaning {
+  transform-origin: 100% 100%;
+  transform: rotate(-9deg);
+  margin-left: calc(var(--dh) * var(--k) * 0.16);
+  margin-right: 6px;
+}
+.bs-bookend {
+  display: block;
+  width: 14px;
+  height: calc(56px * var(--k));
+  margin: 0 7px 0 3px;
+  border-left: 3px solid #a9895c;
+  border-bottom: 4px solid #a9895c;
+  border-radius: 0 0 0 2px;
+  opacity: 0.85;
+}
+.bs-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0 8px;
+  opacity: 0.62;
+}
+.bs-stack span {
+  position: relative;
+  display: block;
+  height: calc(12px * var(--k));
+  border-radius: 1px 2px 2px 1px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+.bs-stack span::after {
+  /* 누운 책의 종이 면 */
+  content: "";
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  bottom: 2px;
+  width: 38%;
+  background: repeating-linear-gradient(to bottom, #efe6d2 0 1px, #d3c6ae 1px 2px);
+  border-radius: 0 1px 1px 0;
+}
+.bs-plant {
+  display: block;
+  width: calc(34px * var(--k));
+  height: calc(48px * var(--k));
+  margin: 0 8px;
+  filter: saturate(0.85) brightness(0.92);
+}
+/* 다음 책을 꽂을 빈자리: 점선 책등 */
+.bs-addslot {
+  position: relative;
+  z-index: 4;
+  flex: 0 0 auto;
+  width: calc(26px * var(--k));
+  height: calc(92px * var(--k));
+  margin: 0 2px 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px dashed rgb(255 236 210 / 0.45);
+  border-bottom: 0;
+  border-radius: 3px 3px 0 0;
+  color: rgb(255 236 210 / 0.8);
+  font-size: 18px;
+  line-height: 1;
+  transition:
+    background 200ms,
+    border-color 200ms;
+}
+.bs-addslot::before {
+  /* 누르기 쉬운 영역 */
+  content: "";
+  position: absolute;
+  inset: -10px -8px 0;
+}
+.bs-addslot:hover {
+  background: rgb(255 236 210 / 0.08);
+  border-color: rgb(255 236 210 / 0.8);
+}
+.bs-addslot:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* 손글씨 POP 카드 */
+.bs-pop {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 4;
+  max-width: 112px;
+  padding: 6px 8px 5px;
+  white-space: pre-line;
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: #2a2119;
+  background: #f3ead8;
+  border-radius: 2px;
+  transform: rotate(2deg);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+/* 아래 설명줄: 꺼낸 책 정보 · 책장 위치 */
+.bs-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 46px;
+  padding-top: 10px;
+  color: var(--color-ink-2);
+}
+.bs-caption p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  min-width: 0;
+  font-size: 12.5px;
+}
+.bs-caption b {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-ink);
+}
+.bs-caption em {
+  font-style: normal;
+  color: var(--color-accent);
+}
+.bs-dots {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  color: var(--color-ink);
+}
+.bs-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: currentColor;
+  opacity: 0.25;
+  transition:
+    width 300ms var(--ease-out-soft),
+    opacity 300ms;
+}
+.bs-dots i.on {
+  width: 18px;
+  opacity: 0.9;
+}
+.bs-arrow {
+  display: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--color-rule);
+  font-size: 15px;
+  color: var(--color-ink);
+}
+.bs-arrow:disabled {
+  opacity: 0.25;
+}
+@media (min-width: 768px) {
+  .bs-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* 홈 등에서 쓰는 한 줄짜리 선반 */
+.bs-strip {
+  flex: none;
+  width: 100%;
+  scroll-snap-align: none;
+}
+.bs-strip .bs-shelf {
+  min-width: max-content;
+  padding-inline: 18px 26px;
+  overflow-x: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bs-slot,
+  .bs-obj {
+    transition: none;
+  }
+}
+
+/*
+  ─────────────────────────────────────────────────────────────
+  만져볼 수 있는 책 (BookViewer)
+  --w: 표지 너비, --t: 두께. 표지 비율은 1 : 1.38
+  모든 장(앞표지 · 종이 · 뒤표지)이 책등(왼쪽 모서리)을 축으로 도는 "경첩"이에요.
+  ─────────────────────────────────────────────────────────────
+*/
+.bv {
+  --h: calc(var(--w) * 1.38);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.bv-stage {
+  position: relative;
+  width: var(--w);
+  height: var(--h);
+  perspective: 1600px;
+  touch-action: pan-y; /* 세로 스크롤은 그대로, 가로로 밀면 책이 돌아가요 */
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  outline: none;
+}
+.bv-stage:active {
+  cursor: grabbing;
+}
+.bv-stage:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 14px;
+  border-radius: 4px;
+}
+.bv-shadow {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: -7%;
+  height: 12%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(20, 14, 8, 0.45), transparent);
+  filter: blur(6px);
+}
+.bv-body {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+/* 돌아간 책의 "보이지 않는 상자"가 옆의 설정 책갈피를 가리지 않게: 눈에 보이는 면만 눌려요 */
+.bv-body,
+.bv-body .bv-hinge,
+.bv-body .bv-spine-hinge,
+.bv-body .bv-sheet {
+  pointer-events: none;
+}
+.bv-body .bv-face,
+.bv-body .bv-spine,
+.bv-body .bv-mark {
+  pointer-events: auto;
+}
+.bv-hinge,
+.bv-spine-hinge {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform-origin: left center;
+}
+.bv-sheet {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+.bv-leaf {
+  inset: 2px 3px 2px 0;
+}
+.bv-spine {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: var(--t);
+  left: calc(var(--t) / -2);
+  transform: rotateY(-90deg);
+  box-shadow:
+    inset -6px 0 10px -6px rgba(0, 0, 0, 0.4),
+    inset 3px 0 6px -4px rgba(255, 255, 255, 0.2);
+}
+.bv-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.bv-back-face {
+  transform: rotateY(180deg);
+}
+.bv-cover-out {
+  overflow: hidden;
+  border-radius: 1.5px 3px 3px 1.5px;
+}
+.bv-back-face.bv-cover-out {
+  border-radius: 3px 1.5px 1.5px 3px;
+}
+.bv-endpaper {
+  border-radius: 1.5px 3px 3px 1.5px;
+}
+/* 종이: 글줄 무늬를 배경으로 그려요 */
+.bv-paper {
+  background:
+    repeating-linear-gradient(
+        to bottom,
+        transparent 0 calc(var(--w) * 0.042),
+        rgba(60, 45, 30, 0.13) calc(var(--w) * 0.042) calc(var(--w) * 0.05)
+      )
+      12% 11% / 76% 76% no-repeat,
+    linear-gradient(90deg, #e2d8c6, #f7f1e5 8%, #f8f3e8);
+  border-radius: 0 2px 2px 0;
+}
+.bv-paper.is-left {
+  background:
+    repeating-linear-gradient(
+        to bottom,
+        transparent 0 calc(var(--w) * 0.042),
+        rgba(60, 45, 30, 0.13) calc(var(--w) * 0.042) calc(var(--w) * 0.05)
+      )
+      12% 11% / 76% 76% no-repeat,
+    linear-gradient(270deg, #e2d8c6, #f7f1e5 8%, #f8f3e8);
+  border-radius: 2px 0 0 2px;
+}
+.bv-paper:has(.bv-text) {
+  background: linear-gradient(90deg, #e2d8c6, #f7f1e5 8%, #f8f3e8);
+}
+.bv-paper.is-left:has(.bv-text) {
+  background: linear-gradient(270deg, #e2d8c6, #f7f1e5 8%, #f8f3e8);
+}
+.bv-text {
+  position: absolute;
+  inset: 11% 12% 12% 10%;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--w) * 0.03);
+}
+.bv-text.is-left {
+  inset: 11% 10% 12% 12%;
+}
+.bv-line {
+  display: block;
+  height: max(2px, calc(var(--w) * 0.012));
+  background: rgba(60, 45, 30, 0.22);
+  border-radius: 1px;
+}
+.bv-gap {
+  height: calc(var(--w) * 0.02);
+}
+.bv-num {
+  position: absolute;
+  bottom: -10%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-serif);
+  font-size: max(9px, calc(var(--w) * 0.05));
+  color: rgba(60, 45, 30, 0.6);
+}
+.bv-marker {
+  position: absolute;
+  top: -6%;
+  left: 0;
+  padding: 2px 5px;
+  font-size: max(8px, calc(var(--w) * 0.042));
+  color: #fff;
+  background: #b0412f;
+  border-radius: 2px;
+}
+/* 뒤표지 */
+.bv-back-art {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 14% 12% 10% 13%;
+}
+.bv-back-title {
+  font-family: var(--font-serif);
+  font-size: 7.5cqw;
+  font-weight: 500;
+  opacity: 0.9;
+}
+.bv-back-blurb {
+  margin-top: 10%;
+  font-family: var(--font-serif);
+  font-size: 5.6cqw;
+  line-height: 1.7;
+  opacity: 0.78;
+}
+.bv-back-foot {
+  margin-top: auto;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  font-size: 4.4cqw;
+  letter-spacing: 0.08em;
+  opacity: 0.8;
+}
+.bv-barcode {
+  width: 30%;
+  height: 9cqw;
+  padding: 1.5cqw;
+  background:
+    repeating-linear-gradient(
+        90deg,
+        #1b1b1b 0 1px,
+        transparent 1px 2px,
+        #1b1b1b 2px 4px,
+        transparent 4px 5px,
+        #1b1b1b 5px 6px,
+        transparent 6px 8px
+      )
+      content-box,
+    #f7f3ea;
+  border-radius: 1px;
+}
+/* 책갈피: 읽던 쪽 사이에 끼워져 위로 삐죽 나와 있어요 */
+.bv-mark {
+  position: absolute;
+  left: 64%;
+  top: -15%;
+  width: 17%;
+  height: 58%;
+  transform-style: preserve-3d;
+  cursor: pointer;
+}
+/* 삐죽 나온 부분이 작아서, 손가락으로 누르기 쉽게 보이지 않는 터치 영역을 넓혀요 */
+.bv-mark::before {
+  content: "";
+  position: absolute;
+  left: -70%;
+  right: -70%;
+  top: -55%;
+  height: 80%;
+}
+.bv-mark .bm {
+  position: absolute;
+  inset: 0;
+  border-radius: 2px 2px 1px 1px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+    0 2px 4px rgba(0, 0, 0, 0.25);
+}
+.bv-mark-cord {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: 1.5px;
+  height: 26%;
+  margin-left: -0.75px;
+  background: linear-gradient(#d9c7a2, #b79d6c);
+  transform-origin: bottom center;
+  transform: rotate(-10deg);
+}
+.bv-mark-cord::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -4px;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f0dfbd, #b08e57);
+}
+.bv-hint {
+  margin-top: 24px;
+  min-height: 1.5em;
+  font-size: 12.5px;
+  color: var(--color-ink-3);
+  text-align: center;
+}
+.bv-controls {
+  margin-top: 8px;
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--color-rule);
+  border-radius: 999px;
+}
+.bv-controls button {
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  color: var(--color-ink-3);
+}
+.bv-controls button[aria-pressed="true"] {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+/* ── 책갈피 무늬 ─────────────────────────────────────────────── */
+.bm {
+  display: block;
+  overflow: hidden;
+}
+.bm-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.bm-night {
+  background: linear-gradient(180deg, #0f1a33, #243258 58%, #3d3f6d);
+}
+.bm-grass {
+  background: linear-gradient(180deg, #cfe3ee 0 55%, #b9d7a0 70%, #6f9a52);
+}
+.bm-sea {
+  background: linear-gradient(180deg, #d9eef2 0 30%, #7fb8cc 55%, #2f6f93);
+}
+.bm-sunset {
+  background: linear-gradient(180deg, #f7d19b 0 20%, #ec9a78 48%, #9a5d86 76%, #5b3a57);
+}
+.bm-blossom {
+  background: linear-gradient(180deg, #fbeef0, #efc3cd 70%, #e3a9b8);
+}
+.bm-snow {
+  background: linear-gradient(180deg, #cfdae6, #a9bacb 70%, #93a7ba);
+}
+.bm-picker {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.bm-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 44px;
+  padding: 4px 2px;
+  font-size: 11.5px;
+  color: var(--color-ink-3);
+}
+.bm-thumb {
+  display: block;
+  width: 26px;
+  height: 64px;
+  border-radius: 3px;
+  overflow: hidden;
+  outline: 1.5px solid transparent;
+  outline-offset: 3px;
+  transition:
+    outline-color 200ms,
+    transform 250ms var(--ease-out-soft);
+}
+.bm-thumb .bm {
+  width: 100%;
+  height: 100%;
+}
+.bm-option:hover .bm-thumb {
+  transform: translateY(-3px);
+}
+.bm-option.is-on {
+  color: var(--color-ink);
+}
+.bm-option.is-on .bm-thumb {
+  outline-color: var(--color-accent);
+}
+
+/* 꺼낸 책은 선반 왼쪽에, 정보 카드는 오른쪽에. 나머지는 잠시 흐리게 */
+.bs-shelf { transition: height 400ms var(--ease-book); }
+.bs-shelf.has-selection { height: 196px; min-width: 0; }
+.bs-shelf.has-selection > .bs-slot:not(.is-selected),
+.bs-shelf.has-selection > .bs-pop,
+.bs-shelf.has-selection > .bs-addslot,
+.bs-fill.is-faded { opacity: .12; }
+.bs-shelf.has-selection .bs-slot.is-selected {
+  position: absolute; left: 5px; bottom: 10px; --k: 1.08;
+  width: 104px; margin: 0; z-index: 6;
+}
+/* 정보 카드: 서점 선반에 꽂아 두는 크림색 소개 카드 (불투명) */
+.bs-info {
+  position: absolute; left: 114px; right: 8px; bottom: 10px; z-index: 7;
+  border-radius: 3px;
+  padding: 12px 12px 11px;
+  background:
+    linear-gradient(to bottom, transparent 0 31px, #d9ccb6 31px 32px, transparent 32px),
+    #f3efe8;
+  color: #1d2128;
+  box-shadow: 0 1px 0 rgb(255 255 255 / .6) inset, 0 10px 22px rgb(var(--case-shade) / .55), 0 2px 4px rgb(0 0 0 / .25);
+  animation: shelf-info-in 300ms var(--ease-out-soft) both;
+}
+.bs-info::before {
+  /* 카드를 붙인 작은 테이프 */
+  content: ""; position: absolute; top: -6px; left: calc(50% - 16px); width: 32px; height: 12px;
+  background: rgb(233 219 186 / .85); transform: rotate(-3deg); box-shadow: 0 1px 1px rgb(0 0 0 / .15);
+}
+.bs-info h3 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; font-family: var(--font-serif); font-size: 15px; font-weight: 600; line-height: 1.35; word-break: keep-all; overflow-wrap: anywhere; margin-top: 9px; }
+.bs-info-status { font-size: 10px; letter-spacing: .06em; color: #8a5a33; }
+.bs-info-author { font-size: 11px; color: #5b554c; margin-top: 3px; }
+.bs-info dl { margin-top: 9px; font-size: 10px; color: #6b6358; display: grid; gap: 2px; }
+.bs-info dl div { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 3px; }
+.bs-info dd { color: #1d2128; }
+.bs-info-actions { display: flex; gap: 5px; margin-top: 10px; }
+.bs-info-actions a { min-height: 34px; display: flex; align-items: center; justify-content: center; flex: 1; border: 1px solid #c9bda8; border-radius: 3px; font-size: 11.5px; white-space: nowrap; color: #1d2128; }
+.bs-info-actions a:first-child { background: #1d2128; color: #f3efe8; border-color: #1d2128; }
+.bs-info-actions a:focus-visible { outline: 2px solid #9b5a33; outline-offset: 3px; }
+.bs-strip .bs-shelf.has-selection { min-width: 320px; }
+.bs-strip .bs-info { max-width: 220px; }
+@keyframes shelf-info-in { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+@media (prefers-reduced-motion: reduce) { .bs-shelf { transition: none; } .bs-info { animation: none; } }
+
+/* ── 책 옆의 설정 책갈피 ──────────────────────────────────────── */
+.bv-stage-wrap {
+  position: relative;
+  isolation: isolate;
+}
+.bv-stage-wrap > .bv-stage,
+.bv-stage-wrap > [style*="view-transition-name"] {
+  position: relative;
+  z-index: 2;
+}
+/* 책상: 책 밑에서 앞뒤로 펼쳐진 원목 상판 */
+.bv-desk {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  width: calc(var(--w) * 2.8);
+  margin-left: calc(var(--w) * -1.4);
+  top: calc(var(--h) * 0.56);
+  height: calc(var(--h) * 0.52);
+}
+/* 책갈피는 책 왼쪽 아래에 가로로 꽂혀 있고, 끝부분이 책 밑으로 들어가 있어요 */
+.bv-tab {
+  position: absolute;
+  z-index: 1;
+  right: calc(100% - 18px);
+  top: 57%;
+  transition:
+    opacity 300ms,
+    transform 500ms var(--ease-book);
+}
+.bv[data-mode="open"] .bv-tab {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(34px);
+}
+.bm-tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 0;
+  touch-action: none;
+  cursor: grab;
+  animation: bm-tab-peek 1.5s var(--ease-book) 1s 1 both;
+}
+.bm-tab:active {
+  cursor: grabbing;
+}
+.bm-tab::before {
+  /* 손가락으로 잡기 쉬운 넓은 영역 */
+  content: "";
+  position: absolute;
+  inset: -14px -2px -10px -12px;
+}
+.bm-tab-ribbon {
+  position: relative;
+  display: block;
+  width: 70px;
+  height: 24px;
+  overflow: hidden;
+  /* 바깥쪽 끝을 제비꼬리처럼 */
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 9px 50%);
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.35));
+}
+.bm-tab-ribbon::after {
+  /* 천 결과 책 밑으로 들어가는 그늘 */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 60%, rgb(0 0 0 / 0.35)), linear-gradient(rgb(255 255 255 / 0.16), transparent 45%, rgb(0 0 0 / 0.18));
+}
+.bm-tab-art {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 24px;
+  height: 70px;
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+.bm-tab-art .bm {
+  width: 100%;
+  height: 100%;
+}
+.bm-tab-label {
+  padding-left: 11px;
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  color: var(--color-ink-3);
+}
+.bm-tab:hover .bm-tab-label,
+.bm-tab[aria-expanded="true"] .bm-tab-label {
+  color: var(--color-ink);
+}
+.bm-tab:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 5px;
+  border-radius: 2px;
+}
+@keyframes bm-tab-peek {
+  0%, 100% { translate: 0 0; }
+  35% { translate: -12px 0; }
+  65% { translate: -2px 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bm-tab { animation: none; }
+}
+
+/* ── 나무 서랍 (왼쪽에서 나와요) ──────────────────────────────── */
+.pd-shade {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: rgb(12 8 4 / 0.48);
+  cursor: default;
+}
+/* 서랍 몸통: 세로 결 원목 */
+.pd-panel {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 71;
+  width: var(--pd-w);
+  display: flex;
+  padding: calc(env(safe-area-inset-top) + 12px) 0 calc(env(safe-area-inset-bottom) + 12px) 12px;
+  background:
+    linear-gradient(90deg, rgb(var(--case-shade) / 0.25), transparent 30%),
+    var(--wood-v),
+    var(--case-wood);
+  box-shadow: 20px 0 44px -18px rgb(0 0 0 / 0.75);
+  touch-action: pan-y; /* 세로는 스크롤, 가로는 서랍 끌기 */
+  outline: none;
+}
+/* 서랍 속: 크림색 종이를 깐 안쪽 */
+.pd-inner {
+  --color-ink: #1d2128;
+  --color-ink-2: #4a4640;
+  --color-ink-3: #7d7366;
+  --color-rule: #dccfbb;
+  --color-accent: #9b5a33;
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 22px 18px 28px;
+  border-radius: 3px;
+  color: var(--color-ink);
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.26 0 0 0 0 0.16 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    #f3efe8;
+  box-shadow:
+    inset 0 3px 8px rgb(0 0 0 / 0.28),
+    inset 0 0 0 1px rgb(0 0 0 / 0.14);
+}
+/* 서랍 앞판 + 황동 손잡이 */
+.pd-front {
+  position: relative;
+  flex: 0 0 24px;
+  margin-top: -12px;
+  margin-bottom: -12px;
+  margin-left: 8px;
+  background:
+    linear-gradient(90deg, rgb(255 236 210 / 0.25) 0 1px, transparent 1px, rgb(var(--case-shade) / 0.3)),
+    var(--wood-v),
+    var(--case-board);
+  background-position: 0 0, -40px -120px, 0 0;
+  box-shadow: -3px 0 6px rgb(0 0 0 / 0.3);
+}
+.pd-pull {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 68px;
+  transform: translate(-50%, -50%);
+  border-radius: 4px;
+  background: linear-gradient(90deg, #6d4f24, #f0d59b 42%, #c49a55 62%, #6d4f24);
+  box-shadow:
+    0 3px 5px rgb(0 0 0 / 0.5),
+    0 0 0 2px rgb(0 0 0 / 0.12);
+}
+/* 이름판: 황동 */
+.pd-title {
+  display: flex;
+}
+.pd-title span {
+  position: relative;
+  padding: 5px 18px 4px;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  color: var(--plate-ink, #2b2015);
+  background: var(--plate-bg, linear-gradient(#e2c68c, #b38d4f));
+  border-radius: 2px;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.45),
+    inset 0 -1px 0 rgb(0 0 0 / 0.2),
+    0 1px 2px rgb(0 0 0 / 0.35);
+}
+.pd-title span::before,
+.pd-title span::after {
+  content: "";
+  position: absolute;
+  top: calc(50% - 1.5px);
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgb(255 255 255 / 0.5), rgb(0 0 0 / 0.45) 70%);
+}
+.pd-title span::before {
+  left: 6px;
+}
+.pd-title span::after {
+  right: 6px;
+}
+.pd-section {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--color-rule);
+}
+.pd-section-title {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  font-weight: 500;
+}
+.pd-section-note {
+  margin-top: 4px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--color-ink-3);
+}
+.pd-section .bm-picker {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px 8px;
+  margin-top: 16px;
+}

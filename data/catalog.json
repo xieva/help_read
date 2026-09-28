@@ -1,0 +1,584 @@
+{
+  "version": 1,
+  "updatedAt": "2026-09-28",
+  "scope": "work",
+  "books": [
+    {
+      "id": "sapiens",
+      "title": "사피엔스",
+      "author": "유발 하라리",
+      "originalTitle": "Sapiens",
+      "authorAliases": [
+        "Yuval Noah Harari"
+      ],
+      "genre": "인문",
+      "tags": [
+        "역사",
+        "문명",
+        "사회"
+      ],
+      "hook": "인류는 어떻게 함께 믿고, 함께 살아왔을까.",
+      "summary": "수렵과 채집으로 살아가던 인류가 농업, 화폐, 종교, 국가를 만들어 온 과정을 따라간다. 하라리는 생물학과 역사, 경제를 오가며 인간이 대규모로 협력하게 된 배경과 그 변화의 대가를 묻는다.",
+      "readingQuestion": "당연하게 여기는 제도 가운데 사람들이 함께 믿기 때문에 유지되는 것은 무엇일까?",
+      "sources": [
+        {
+          "id": "description",
+          "label": "저자 공식 소개",
+          "url": "https://www.ynharari.com/book/sapiens/",
+          "accessedAt": "2026-09-28",
+          "kind": "author-description"
+        }
+      ],
+      "reviews": [],
+      "artwork": {
+        "path": "/covers/sapiens.webp",
+        "kind": "generated-wraparound",
+        "ink": "#222820"
+      }
+    },
+    {
+      "id": "laws-of-human-nature",
+      "title": "인간 본성의 법칙",
+      "author": "로버트 그린",
+      "originalTitle": "The Laws of Human Nature",
+      "authorAliases": [
+        "Robert Greene"
+      ],
+      "genre": "인문",
+      "tags": [
+        "심리",
+        "관계",
+        "자기이해"
+      ],
+      "hook": "타인을 읽는 일은 나를 아는 데서 시작된다.",
+      "summary": "역사 속 인물과 철학의 사례로 사람의 행동 뒤에 있는 욕망과 감정을 살핀다. 감정에 휩쓸리는 순간을 알아차리고, 타인의 관점을 이해하며, 집단의 압력에서 자신의 판단을 지키는 방법을 다룬다.",
+      "readingQuestion": "타인을 설명할 때 쓰는 기준을 나에게도 똑같이 적용할 수 있을까?",
+      "sources": [
+        {
+          "id": "description",
+          "label": "Penguin Books · 출판사 소개",
+          "url": "https://www.penguinrandomhouse.com/books/317474/the-laws-of-human-nature-by-robert-greene/",
+          "accessedAt": "2026-09-28",
+          "kind": "publisher-description"
+        }
+      ],
+      "reviews": [
+        {
+          "outlet": "Quartz",
+          "summary": "흥미로운 발상과 읽기 쉬운 서술, 자유와 창의성을 강조하는 점에 주목한다.",
+          "sourceId": "description",
+          "kind": "publisher-selected-review"
+        }
+      ],
+      "artwork": {
+        "path": "/covers/laws-of-human-nature.webp",
+        "kind": "generated-wraparound",
+        "ink": "#222820"
+      }
+    },
+    {
+      "id": "demian",
+      "title": "데미안",
+      "author": "헤르만 헤세",
+      "originalTitle": "Demian",
+      "authorAliases": [
+        "Hermann Hesse"
+      ],
+      "genre": "소설",
+      "tags": [
+        "성장",
+        "자기이해",
+        "고전"
+      ],
+      "hook": "내 안의 낯선 세계를 향해.",
+      "summary": "소년 싱클레어는 익숙한 가정의 질서 밖에 있는 세계에 이끌린다. 신비로운 친구 데미안과의 만남은 선과 악에 대한 확신을 흔들고, 그는 타인이 정해 준 삶에서 벗어나 자신의 내면을 탐색한다.",
+      "readingQuestion": "내가 선택한 가치와 주변에서 물려받은 가치는 어디에서 갈라질까?",
+      "sources": [
+        {
+          "id": "description",
+          "label": "Penguin Classics · 출판사 소개",
+          "url": "https://www.penguinrandomhouse.com/books/299804/demian-by-hermann-hesse-foreword-by-james-franco-introduction-by-ralph-freedman-translated-by-damion-searls/",
+          "accessedAt": "2026-09-28",
+          "kind": "publisher-description"
+        }
+      ],
+      "reviews": [
+        {
+          "outlet": "가와카미 미에코 · The Guardian",
+          "summary": "자신감이 부족하고 내성적인 싱클레어에게 느꼈던 개인적인 공감을 이야기한다.",
+          "sourceId": "description",
+          "kind": "publisher-selected-review"
+        }
+      ],
+      "artwork": {
+        "path": "/covers/demian.webp",
+        "kind": "generated-wraparound",
+        "ink": "#f4eee2"
+      }
+    },
+    {
+      "id": "justice",
+      "title": "정의란 무엇인가",
+      "author": "마이클 샌델",
+      "originalTitle": "Justice",
+      "authorAliases": [
+        "Michael Sandel"
+      ],
+      "genre": "인문",
+      "tags": [
+        "철학",
+        "사회",
+        "윤리"
+      ],
+      "hook": "우리는 어떤 선택을 공정하다고 부를까.",
+      "summary": "공적 삶에서 만나는 논쟁과 딜레마를 통해 정의의 의미를 살핀다. 샌델은 서로 다른 도덕적 판단이 어떤 철학적 전제에 기대는지 드러내고, 권리와 선택, 공동선에 관한 대화로 독자를 이끈다.",
+      "readingQuestion": "같은 결론에 동의하더라도 그 이유가 다르면 어떤 차이가 생길까?",
+      "sources": [
+        {
+          "id": "description",
+          "label": "Farrar, Straus and Giroux · 출판사 소개",
+          "url": "https://us.macmillan.com/books/9780374532505/justice/",
+          "accessedAt": "2026-09-28",
+          "kind": "publisher-description"
+        }
+      ],
+      "reviews": [
+        {
+          "outlet": "Jonathan Ree · The Observer",
+          "summary": "난처한 사례를 철학적 토론으로 이어 가며 함께 살 사회의 모습을 생각하게 한다고 평가한다.",
+          "sourceId": "description",
+          "kind": "publisher-selected-review"
+        }
+      ],
+      "artwork": {
+        "path": "/covers/justice.webp",
+        "kind": "generated-wraparound",
+        "ink": "#222820"
+      }
+    },
+    {
+      "id": "economics-concert",
+      "title": "경제학 콘서트",
+      "author": "팀 하포드",
+      "originalTitle": "The Undercover Economist",
+      "authorAliases": [
+        "Tim Harford"
+      ],
+      "genre": "경제",
+      "tags": [
+        "경제",
+        "일상",
+        "사회"
+      ],
+      "hook": "커피 한 잔 뒤에 숨어 있는 경제.",
+      "summary": "익숙한 거리와 일상적인 소비를 경제학의 시선으로 다시 본다. 가격, 정보, 협상과 경쟁이 개인의 선택과 시장을 어떻게 움직이는지, 수식보다 구체적인 상황을 통해 설명한다.",
+      "readingQuestion": "최근 산 물건의 가격에는 희소성이나 정보의 차이가 얼마나 반영돼 있을까?",
+      "sources": [
+        {
+          "id": "description",
+          "label": "Hachette · 출판사 소개",
+          "url": "https://www.hachette.co.uk/titles/tim-harford/the-undercover-economist/9781405504072/",
+          "accessedAt": "2026-09-28",
+          "kind": "publisher-description"
+        }
+      ],
+      "reviews": [
+        {
+          "outlet": "The Times",
+          "summary": "일상의 현상을 통해 경제학적 사고에 입문하도록 돕는 점을 짚는다.",
+          "sourceId": "description",
+          "kind": "publisher-selected-review"
+        }
+      ],
+      "artwork": {
+        "path": "/covers/economics-concert.webp",
+        "kind": "generated-wraparound",
+        "ink": "#222820"
+      }
+    },
+    {
+      "id": "vegetarian",
+      "title": "채식주의자",
+      "author": "한강",
+      "originalTitle": "The Vegetarian",
+      "authorAliases": [
+        "Han Kang"
+      ],
+      "genre": "소설",
+      "tags": [
+        "관계",
+        "사회",
+        "자기이해"
+      ],
+      "hook": "한 사람의 거부가 흔드는 일상의 질서.",
+      "summary": "불편한 꿈을 꾼 뒤 고기를 먹지 않겠다고 선언한 영혜. 작은 선택처럼 보였던 행동은 가족 안의 통제와 욕망을 드러낸다. 서로 다른 시선으로 이어지는 이야기는 몸과 폭력, 타인을 이해할 수 있는 한계를 묻는다.",
+      "readingQuestion": "타인을 걱정한다는 말은 언제 그 사람을 통제하는 말이 될까?",
+      "sources": [
+        {
+          "id": "description",
+          "label": "Hogarth · 출판사 소개",
+          "url": "https://www.penguinrandomhouse.com/books/250333/the-vegetarian-by-han-kang/",
+          "accessedAt": "2026-09-28",
+          "kind": "publisher-description"
+        }
+      ],
+      "reviews": [],
+      "artwork": {
+        "path": "/covers/vegetarian.webp",
+        "kind": "generated-wraparound",
+        "ink": "#222820"
+      }
+    },
+    {
+      "id": "1984",
+      "title": "1984",
+      "author": "조지 오웰",
+      "originalTitle": "Nineteen Eighty-Four",
+      "authorAliases": [
+        "George Orwell"
+      ],
+      "genre": "소설",
+      "tags": [
+        "사회",
+        "고전",
+        "권력"
+      ],
+      "hook": "기억과 언어마저 감시받는 세계.",
+      "summary": "진리부에서 기록을 고치는 윈스턴 스미스는 당이 요구하는 역사와 자신이 기억하는 현실 사이에서 갈등한다. 스스로 생각하려는 작은 움직임이 끊임없는 감시와 충돌하며, 권력이 진실을 지배하는 사회의 모습을 드러낸다.",
+      "readingQuestion": "기록이 바뀌었을 때 개인은 무엇을 근거로 진실을 지킬 수 있을까?",
+      "sources": [
+        {
+          "id": "description",
+          "label": "Penguin Books · 출판사 소개",
+          "url": "https://www.penguinrandomhouse.com/books/326569/1984-by-george-orwell-with-a-foreword-by-thomas-pynchon/",
+          "accessedAt": "2026-09-28",
+          "kind": "publisher-description"
+        }
+      ],
+      "reviews": [],
+      "artwork": {
+        "path": "/covers/1984.webp",
+        "kind": "generated-wraparound",
+        "ink": "#222820"
+      }
+    },
+    {
+      "id": "selfish-gene",
+      "title": "이기적 유전자",
+      "author": "리처드 도킨스",
+      "originalTitle": "The Selfish Gene",
+      "authorAliases": [
+        "Richard Dawkins"
+      ],
+      "genre": "과학",
+      "tags": [
+        "진화",
+        "생명",
+        "과학"
+      ],
+      "hook": "생명을 유전자의 시선으로 바라보다.",
+      "summary": "진화의 과정을 유전 정보의 복제와 전달이라는 관점에서 설명한다. 개체의 행동, 경쟁과 협력이 어떻게 연결되는지 살피고, 생명을 이해하는 관찰의 단위를 바꾸었을 때 생기는 새로운 질문을 보여 준다.",
+      "readingQuestion": "개체의 이익과 유전자의 전파를 구분하면 협력을 어떻게 설명할 수 있을까?",
+      "sources": [
+        {
+          "id": "description",
+          "label": "Oxford University Press · 출판사 소개",
+          "url": "https://india.oup.com/product/the-selfish-gene-9780198788607",
+          "accessedAt": "2026-09-28",
+          "kind": "publisher-description"
+        }
+      ],
+      "reviews": [],
+      "artwork": {
+        "path": "/covers/selfish-gene.webp",
+        "kind": "generated-wraparound",
+        "ink": "#222820"
+      }
+    },
+    {
+      "id": "almond",
+      "title": "아몬드",
+      "author": "손원평",
+      "originalTitle": "Almond",
+      "authorAliases": [
+        "Won-Pyung Sohn"
+      ],
+      "genre": "소설",
+      "tags": [
+        "성장",
+        "관계",
+        "공감"
+      ],
+      "hook": "서로 다른 두 소년이 마음을 배우는 시간.",
+      "summary": "감정을 느끼고 표현하는 데 어려움이 있는 윤재는 가족의 보호 속에서 살아간다. 갑작스러운 폭력으로 일상이 무너진 뒤, 분노를 안고 살아가는 곤이와 만나 관계를 맺으며 자신의 세계를 조금씩 넓혀 간다.",
+      "readingQuestion": "감정을 표현하는 방식이 다른 사람을 우리는 어떻게 이해할 수 있을까?",
+      "sources": [
+        {
+          "id": "description",
+          "label": "한국문학번역원 · HarperVia 소개 수록",
+          "url": "https://library.ltikorea.or.kr/translatedbooks/406626?locale=ko",
+          "accessedAt": "2026-09-28",
+          "kind": "publisher-description"
+        }
+      ],
+      "reviews": [],
+      "artwork": {
+        "path": "/covers/almond.webp",
+        "kind": "generated-wraparound",
+        "ink": "#222820"
+      }
+    },
+    {
+      "id": "old-man-and-the-sea",
+      "title": "노인과 바다",
+      "author": "어니스트 헤밍웨이",
+      "originalTitle": "The Old Man and the Sea",
+      "authorAliases": [
+        "Ernest Hemingway"
+      ],
+      "genre": "소설",
+      "tags": [
+        "고전",
+        "삶",
+        "자연"
+      ],
+      "hook": "바다 위에서 끝까지 지키려는 것.",
+      "summary": "오랫동안 고기를 잡지 못한 쿠바의 늙은 어부가 먼 바다에서 거대한 청새치를 만난다. 홀로 이어 가는 사투를 간결한 문장으로 그리며, 실패와 상실 속에서도 남는 용기와 존엄을 돌아보게 한다.",
+      "readingQuestion": "결과와 별개로 한 사람의 노력을 가치 있게 만드는 것은 무엇일까?",
+      "sources": [
+        {
+          "id": "description",
+          "label": "Scribner · 출판사 소개",
+          "url": "https://www.simonandschuster.com/books/Old-Man-and-the-Sea/Ernest-Hemingway/9780684801223",
+          "accessedAt": "2026-09-28",
+          "kind": "publisher-description"
+        }
+      ],
+      "reviews": [],
+      "artwork": {
+        "path": "/covers/old-man-and-the-sea.webp",
+        "kind": "generated-wraparound",
+        "ink": "#222820"
+      }
+    },
+    {
+      "id": "cosmos",
+      "title": "코스모스",
+      "author": "칼 세이건",
+      "originalTitle": "Cosmos",
+      "authorAliases": [
+        "Carl Sagan"
+      ],
+      "genre": "과학",
+      "tags": [
+        "우주",
+        "과학",
+        "생명"
+      ],
+      "hook": "우주를 알아가는 인간의 작은 자리.",
+      "summary": "우주의 진화에서 생명의 기원, 인간의 뇌와 우주 탐사까지 시야를 넓힌다. 과학적 발견을 문명의 역사와 함께 이야기하며, 지구에 사는 우리가 광대한 우주를 어떻게 이해해 왔는지 돌아본다.",
+      "readingQuestion": "우주의 규모를 생각하는 일이 일상의 판단에 어떤 영향을 줄까?",
+      "sources": [
+        {
+          "id": "description",
+          "label": "Ballantine Books · 출판사 소개",
+          "url": "https://www.penguinrandomhouse.com/books/159730/cosmos-by-carl-sagan/",
+          "accessedAt": "2026-09-28",
+          "kind": "publisher-description"
+        }
+      ],
+      "reviews": [
+        {
+          "outlet": "Newsday",
+          "summary": "천문학과 역사, 인간에 대한 관심이 함께 담긴 시선을 높이 평가한다.",
+          "sourceId": "description",
+          "kind": "publisher-selected-review"
+        }
+      ],
+      "artwork": {
+        "path": "/covers/cosmos.webp",
+        "kind": "generated-wraparound",
+        "ink": "#222820"
+      }
+    },
+    {
+      "id": "factfulness",
+      "title": "팩트풀니스",
+      "author": "한스 로슬링",
+      "originalTitle": "Factfulness",
+      "authorAliases": [
+        "Hans Rosling"
+      ],
+      "genre": "인문",
+      "tags": [
+        "데이터",
+        "사회",
+        "사고법"
+      ],
+      "hook": "세상을 보는 감각을 사실로 점검하다.",
+      "summary": "세계를 둘로 나누거나 나쁜 소식에 더 주목하는 등 현실을 왜곡해 보는 열 가지 본능을 살핀다. 한스 로슬링과 공동 저자들은 자료와 비교를 통해 막연한 인상을 확인하고, 사실에 근거해 판단하는 습관을 제안한다.",
+      "readingQuestion": "최근 믿게 된 주장 하나를 분모와 추세, 비교 대상을 바꿔 다시 볼 수 있을까?",
+      "sources": [
+        {
+          "id": "description",
+          "label": "Gapminder · 저자 재단 소개",
+          "url": "https://www.gapminder.org/factfulness-book/",
+          "accessedAt": "2026-09-28",
+          "kind": "author-description"
+        }
+      ],
+      "reviews": [],
+      "artwork": {
+        "path": "/covers/factfulness.webp",
+        "kind": "generated-wraparound",
+        "ink": "#222820"
+      }
+    },
+    {
+      "id": "guns-germs-steel",
+      "title": "총, 균, 쇠",
+      "author": "재레드 다이아몬드",
+      "originalTitle": "Guns, Germs, and Steel",
+      "authorAliases": [
+        "Jared Diamond"
+      ],
+      "genre": "인문",
+      "tags": [
+        "역사",
+        "문명",
+        "환경"
+      ],
+      "hook": "문명의 다른 경로를 환경에서 묻다.",
+      "summary": "대륙마다 사회의 발전 경로가 달라진 이유를 지리와 환경, 작물과 가축의 분포에서 찾는다. 농업의 확산과 기술, 질병, 정복의 관계를 연결하며 역사적 불평등을 인종의 우열로 설명하는 관점에 반박한다.",
+      "readingQuestion": "환경을 중심에 둔 설명은 어떤 사건을 잘 설명하고, 어떤 차이를 놓칠 수 있을까?",
+      "sources": [
+        {
+          "id": "description",
+          "label": "W. W. Norton · 출판사 소개",
+          "url": "https://wwnorton.co.uk/books/9780393354324-guns-germs-and-steel",
+          "accessedAt": "2026-09-28",
+          "kind": "publisher-description"
+        }
+      ],
+      "reviews": [
+        {
+          "outlet": "Colin Renfrew · Nature",
+          "summary": "넓은 역사적 범위와 문화가 작동하는 방식에 대한 설명력, 읽기 쉬운 서술에 주목한다.",
+          "sourceId": "description",
+          "kind": "publisher-selected-review"
+        }
+      ],
+      "artwork": {
+        "path": "/covers/guns-germs-steel.webp",
+        "kind": "generated-wraparound",
+        "ink": "#222820"
+      }
+    },
+    {
+      "id": "the-stranger",
+      "title": "이방인",
+      "author": "알베르 카뮈",
+      "originalTitle": "The Stranger",
+      "authorAliases": [
+        "Albert Camus"
+      ],
+      "genre": "소설",
+      "tags": [
+        "고전",
+        "철학",
+        "사회"
+      ],
+      "hook": "세상의 기대와 어긋난 한 사람.",
+      "summary": "알제리의 강렬한 햇빛 아래 벌어진 살인 사건에 한 평범한 남자가 얽힌다. 인물의 태도와 사회의 판단 사이에 생기는 간극을 통해, 카뮈는 부조리 앞에 선 인간과 도덕적 확신의 불안함을 드러낸다.",
+      "readingQuestion": "우리는 한 사람의 행동과 그가 보여 주는 감정 중 무엇을 심판할까?",
+      "sources": [
+        {
+          "id": "description",
+          "label": "Everyman’s Library · 출판사 소개",
+          "url": "https://www.penguinrandomhouse.com/books/23477/the-stranger-by-albert-camus-translated-by-matthew-ward-introduction-by-keith-gore/",
+          "accessedAt": "2026-09-28",
+          "kind": "publisher-description"
+        }
+      ],
+      "reviews": [],
+      "artwork": {
+        "path": "/covers/the-stranger.webp",
+        "kind": "generated-wraparound",
+        "ink": "#222820"
+      }
+    },
+    {
+      "id": "stoner",
+      "title": "스토너",
+      "author": "존 윌리엄스",
+      "originalTitle": "Stoner",
+      "authorAliases": [
+        "John Williams"
+      ],
+      "genre": "소설",
+      "tags": [
+        "삶",
+        "고전",
+        "관계"
+      ],
+      "hook": "조용한 생애에도 깊은 파문이 있다.",
+      "summary": "가난한 농가에서 태어난 윌리엄 스토너는 농학을 배우러 간 대학에서 문학을 만나 학자의 길을 택한다. 결혼과 일, 사랑에서 겪는 실망을 따라가며 눈에 띄지 않는 한 생애의 고독과 버팀을 세밀하게 그린다.",
+      "readingQuestion": "성공과 실패라는 말만으로 한 사람의 삶을 설명할 수 있을까?",
+      "sources": [
+        {
+          "id": "description",
+          "label": "NYRB Classics · 출판사 소개",
+          "url": "https://www.nyrb.com/products/stoner",
+          "accessedAt": "2026-09-28",
+          "kind": "publisher-description"
+        }
+      ],
+      "reviews": [
+        {
+          "outlet": "The Boston Globe",
+          "summary": "평범하고 실망 많은 삶을 미화하지 않으면서도 깊이 있는 인물로 그려 낸 점을 평가한다.",
+          "sourceId": "description",
+          "kind": "publisher-selected-review"
+        }
+      ],
+      "artwork": {
+        "path": "/covers/stoner.webp",
+        "kind": "generated-wraparound",
+        "ink": "#222820"
+      }
+    },
+    {
+      "id": "person-place-hospitality",
+      "title": "사람, 장소, 환대",
+      "author": "김현경",
+      "originalTitle": "사람 장소 환대",
+      "authorAliases": [
+        "김현경"
+      ],
+      "genre": "인문",
+      "tags": [
+        "관계",
+        "사회",
+        "철학"
+      ],
+      "hook": "누군가에게 자리를 내어 준다는 것.",
+      "summary": "인류학자 김현경은 한 사람이 사회의 구성원으로 인정받는 조건을 사람, 장소, 환대라는 개념으로 탐색한다. 인간으로 태어나는 것과 사회 안에서 사람으로 대우받는 일 사이의 거리를 질문한다.",
+      "readingQuestion": "내가 속한 공간은 새로 들어온 사람에게 어떤 자리를 내어 주고 있을까?",
+      "sources": [
+        {
+          "id": "description",
+          "label": "교보문고 · 출판사 소개 수록",
+          "url": "https://product.kyobobook.co.kr/detail/S000000570071",
+          "accessedAt": "2026-09-28",
+          "kind": "publisher-description"
+        }
+      ],
+      "reviews": [],
+      "artwork": {
+        "path": "/covers/person-place-hospitality.webp",
+        "kind": "generated-wraparound",
+        "ink": "#222820"
+      }
+    }
+  ]
+}

@@ -1,0 +1,506 @@
+@import "tailwindcss";
+
+/*
+  ─────────────────────────────────────────────────────────────
+  디자인 시스템: "저녁의 독서실"
+  - 종이처럼 아주 약간 따뜻한 바탕, 짙은 차콜 글자
+  - 가죽 장정 같은 코냑 브라운 한 가지만 포인트로
+  - 책이 가장 중요한 오브젝트. 나머지는 여백과 타이포그래피로.
+  ─────────────────────────────────────────────────────────────
+*/
+@theme {
+  --color-paper: #f3efe8; /* 바탕 (로고의 크림) */
+  --color-paper-2: #ece5d9; /* 한 톤 깊은 종이 */
+  --color-paper-3: #e2d9ca; /* 가장 깊은 종이 */
+  --color-lamp: #fffaf1; /* 스탠드 불빛 */
+  --color-ink: #1d2128; /* 본문 (로고의 잉크) */
+  --color-ink-2: #4b433b; /* 부드러운 본문 */
+  --color-ink-3: #8a7f72; /* 보조 설명 */
+  --color-ink-4: #b3a999; /* 아주 옅은 글자 */
+  --color-rule: #dbd1c1; /* 선 */
+  --color-accent: #9b5a33; /* 코냑 브라운 */
+  --color-accent-soft: #c69a78;
+  --color-night: #16130f; /* 독서 모드 */
+  --color-night-2: #221d18;
+  --color-night-ink: #ede4d3;
+
+  /* 라틴 문자와 숫자는 Garamond, 한글은 Noto Serif KR 로 섞어서 씁니다 */
+  --font-serif: var(--font-garamond), var(--font-noto-serif-kr), "AppleMyungjo", serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR",
+    "Malgun Gothic", sans-serif;
+
+  --ease-out-soft: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-book: cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+:root {
+  /* 글꼴 이름 (app/layout.tsx 에서 Google Fonts 로 불러와요) */
+  --font-garamond: "EB Garamond";
+  --font-noto-serif-kr: "Noto Serif KR";
+}
+
+html,
+body {
+  /* 스탠드 불빛처럼 화면 밖으로 번지는 요소 때문에 옆으로 밀리지 않게 (sticky 는 그대로 동작) */
+  overflow-x: clip;
+}
+
+/* 버튼·링크를 누를 때 확대 대기 없이 바로 반응하도록 */
+a,
+button,
+[role="button"],
+input,
+select,
+textarea,
+label {
+  touch-action: manipulation;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  word-break: keep-all;
+}
+
+/* 아주 옅은 종이 결. 화면 전체에 고정되어 스크롤해도 움직이지 않아요 */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.55;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.26 0 0 0 0 0.16 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+::selection {
+  background: color-mix(in oklab, var(--color-accent) 22%, transparent);
+}
+
+/* ── 레이아웃 ─────────────────────────────────────────────── */
+
+/* 화면 폭에 맞춰 좌우 여백을 잡아주는 기본 틀 */
+.wrap {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 22px;
+}
+@media (min-width: 768px) {
+  .wrap {
+    padding-inline: 48px;
+  }
+}
+@media (min-width: 1200px) {
+  .wrap {
+    padding-inline: 64px;
+  }
+}
+
+/* ── 타이포그래피 ─────────────────────────────────────────── */
+
+.eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--color-ink-3);
+}
+
+.numeral {
+  font-family: var(--font-serif);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.oldstyle {
+  font-family: var(--font-serif);
+  font-variant-numeric: oldstyle-nums proportional-nums;
+}
+
+/* ── 인터랙션 ─────────────────────────────────────────────── */
+
+/* 누르는 순간 살짝 눌리는 느낌 */
+.press {
+  transition:
+    transform 160ms var(--ease-out-soft),
+    opacity 160ms var(--ease-out-soft),
+    background-color 200ms ease;
+}
+.press:active {
+  transform: scale(0.975);
+}
+
+/* 밑줄이 왼쪽에서 자라나는 텍스트 링크 */
+.link-line {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 400ms var(--ease-out-soft);
+  padding-bottom: 2px;
+}
+.link-line:hover,
+.group:hover .link-line {
+  background-size: 100% 1px;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── 책 표지 (평면) ───────────────────────────────────────── */
+
+.cover {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.5px 3px 3px 1.5px;
+  isolation: isolate;
+}
+/* 인쇄된 종이의 결 */
+.cover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.25 0 0 0 0 0.2 0 0 0 0.18 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* 책등 쪽 접힘선과 빛 */
+.cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.28) 0%,
+      rgba(0, 0, 0, 0.06) 2.8%,
+      rgba(255, 255, 255, 0.16) 4%,
+      rgba(255, 255, 255, 0) 7%,
+      rgba(0, 0, 0, 0) 92%,
+      rgba(0, 0, 0, 0.06) 100%
+    ),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 38%);
+}
+
+/* 놓여 있는 책의 두께와 그림자 (작은 표지용) */
+.book-lift {
+  box-shadow:
+    1px 0 0 rgba(255, 255, 255, 0.25) inset,
+    0 1px 1px rgba(40, 28, 16, 0.12),
+    0 3px 6px -2px rgba(40, 28, 16, 0.18),
+    0 14px 24px -12px rgba(40, 28, 16, 0.35);
+}
+
+/* 오른쪽에 살짝 보이는 종이 면 */
+.book-pages {
+  box-shadow:
+    1px 0 0 #f6f1e8,
+    2px 0 0 #ddd4c5,
+    3px 0 0 #f3ede3,
+    4px 0 0 #d6ccbc,
+    0 1px 1px rgba(40, 28, 16, 0.12),
+    0 6px 10px -4px rgba(40, 28, 16, 0.22),
+    0 18px 28px -14px rgba(40, 28, 16, 0.4);
+}
+
+/* ── 책 오브젝트 (입체) ───────────────────────────────────── */
+/*
+  --w: 표지 너비, --t: 두께. 실제 책처럼 표지·책등·종이 면으로 이루어져 있어요.
+  기본은 책등이 아주 조금 보이게 돌아가 있고, 손을 올리면 정면으로 돌아옵니다.
+*/
+.book3d {
+  --h: calc(var(--w) * 1.38);
+  --ry: 18deg;
+  width: var(--w);
+  height: var(--h);
+  perspective: 1400px;
+  position: relative;
+}
+.book3d-body {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateY(var(--ry));
+  transition: transform 700ms var(--ease-book);
+}
+.book3d-front,
+.book3d-back {
+  position: absolute;
+  inset: 0;
+}
+.book3d-front {
+  transform: translateZ(calc(var(--t) / 2));
+}
+.book3d-back {
+  transform: rotateY(180deg) translateZ(calc(var(--t) / 2));
+  background: var(--spine);
+  border-radius: 3px;
+}
+.book3d-spine,
+.book3d-edge {
+  position: absolute;
+  top: 0;
+  width: var(--t);
+  height: 100%;
+  left: calc(50% - var(--t) / 2);
+}
+.book3d-spine {
+  transform: rotateY(-90deg) translateZ(calc(var(--w) / 2));
+  background: var(--spine);
+  box-shadow: inset -6px 0 10px -6px rgba(0, 0, 0, 0.35), inset 3px 0 6px -4px rgba(255, 255, 255, 0.2);
+}
+.book3d-edge {
+  transform: rotateY(90deg) translateZ(calc(var(--w) / 2 - 2px));
+  height: calc(100% - 4px);
+  top: 2px;
+  background: repeating-linear-gradient(90deg, #f3ede2 0 1px, #e3d9c9 1px 2px), #efe8dc;
+  box-shadow: inset 0 0 8px rgba(80, 60, 40, 0.18);
+}
+/* 책 아래 탁자에 닿는 그림자 */
+.book3d-shadow {
+  position: absolute;
+  left: 4%;
+  right: -6%;
+  bottom: -5%;
+  height: 12%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(40, 26, 14, 0.38), rgba(40, 26, 14, 0));
+  filter: blur(6px);
+  transition:
+    transform 700ms var(--ease-book),
+    opacity 700ms var(--ease-book);
+  z-index: -1;
+}
+.book3d-cast {
+  position: absolute;
+  inset: 6% -8% -2% 18%;
+  background: rgba(40, 26, 14, 0.2);
+  filter: blur(26px);
+  border-radius: 12px;
+  z-index: -1;
+  transition: transform 700ms var(--ease-book);
+}
+
+.book3d-interactive:hover .book3d-body,
+.book3d-interactive:focus-visible .book3d-body {
+  transform: rotateY(6deg) translateY(-6px);
+}
+.book3d-interactive:hover .book3d-shadow {
+  transform: scale(0.92);
+  opacity: 0.8;
+}
+.book3d-interactive:active .book3d-body {
+  transform: rotateY(4deg) translateY(-2px) scale(0.985);
+  transition-duration: 200ms;
+}
+
+/* 스탠드 불빛 */
+/* 스탠드 불빛 (테마마다 색과 세기가 달라요: themes.css 의 --lamp, --lamp-a) */
+.lamp {
+  background: radial-gradient(
+    closest-side,
+    rgb(var(--lamp) / calc(1 * var(--lamp-a))) 0%,
+    rgb(var(--lamp) / calc(0.75 * var(--lamp-a))) 38%,
+    rgb(var(--lamp) / 0) 100%
+  );
+}
+
+/* ── 책등 (선반에 꽂힌 책) ───────────────────────────────── */
+
+.spine {
+  position: relative;
+  border-radius: 2px 2px 1px 1px;
+  transition: transform 450ms var(--ease-book);
+  box-shadow:
+    inset 2px 0 3px -1px rgba(255, 255, 255, 0.18),
+    inset -3px 0 5px -2px rgba(0, 0, 0, 0.35),
+    0 1px 0 rgba(0, 0, 0, 0.1);
+}
+.spine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.12), rgba(255, 255, 255, 0.07) 40%, rgba(0, 0, 0, 0.14));
+  pointer-events: none;
+}
+.spine-link:hover .spine,
+.spine-link:focus-visible .spine {
+  transform: translateY(-10px);
+}
+.spine-link:active .spine {
+  transform: translateY(-6px);
+}
+
+/* ── 화면 전환 (View Transitions) ────────────────────────── */
+
+::view-transition {
+  pointer-events: none;
+}
+
+/* 페이지 전체는 짧고 부드럽게 겹쳐 바뀝니다 */
+::view-transition-old(root) {
+  animation: 180ms ease-in both vt-fade-out;
+}
+::view-transition-new(root) {
+  animation: 320ms var(--ease-out-soft) 60ms both vt-fade-in;
+}
+
+/* 책 표지는 누른 자리에서 다음 화면의 자리로 이어서 움직입니다 */
+::view-transition-group(.book-morph) {
+  animation-duration: 520ms;
+  animation-timing-function: var(--ease-book);
+  z-index: 50;
+}
+::view-transition-image-pair(.book-morph) {
+  isolation: auto;
+}
+::view-transition-old(.book-morph),
+::view-transition-new(.book-morph) {
+  animation-duration: 520ms;
+  mix-blend-mode: normal;
+  height: 100%;
+  object-fit: fill;
+}
+
+/* 메뉴는 전환 중에도 제자리에 */
+::view-transition-group(site-nav) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-nav) {
+  display: none;
+}
+::view-transition-new(site-nav) {
+  animation: none;
+}
+
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+  .book3d-body,
+  .spine {
+    transition: none;
+  }
+}
+
+/* Functional workspace UI; full art direction awaits design approval. */
+.reader-button { display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:11px 20px; background:var(--color-ink); color:var(--color-paper); border:1px solid var(--color-ink); border-radius:4px; font-size:14px; cursor:pointer; }
+.reader-button.is-small { min-height:38px; padding:7px 14px; font-size:13px; }
+.reader-button.secondary { background:transparent; color:var(--color-ink); border-color:var(--color-rule); }
+.reader-button:focus-visible, .reader-close:focus-visible { outline:2px solid var(--color-accent); outline-offset:4px; }
+.reader-empty { padding:45px 20px 60px; text-align:center; border-block:1px solid var(--color-rule); margin-top:16px; }
+.reader-empty h2 { font-size:24px; font-weight:500; }
+.reader-empty p { color:var(--color-ink-2); margin-top:12px; }
+.empty-volumes { display:flex; align-items:flex-end; justify-content:center; gap:6px; height:110px; margin-bottom:30px; }
+.empty-volumes i { width:23px; height:85px; background:#a4a99c22; border:1px solid #a4a99c55; border-radius:2px; }
+.empty-volumes i:nth-child(2) { height:100px; width:29px; }
+.empty-volumes i:last-child { transform:rotate(-7deg); height:78px; }
+.reader-current { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:25px 0; border-block:1px solid var(--color-rule); }
+.reader-filters { display:flex; gap:16px; }
+.reader-filters label:first-child { flex:1; min-width:0; }
+.reader-filters input,.reader-filters select { width:100%; min-height:44px; padding:10px 0; background:transparent; border-bottom:1px solid var(--color-rule); font-size:16px; }
+.reader-filters select { max-width:140px; }
+.reader-tabs { display:flex; gap:20px; padding:10px 0 14px; overflow-x:auto; white-space:nowrap; }
+.reader-tabs button { font-size:14px; padding:5px 0; border-bottom:1px solid transparent; color:var(--color-ink-3); }
+.reader-tabs button[aria-pressed=true] { color:var(--color-ink); border-color:var(--color-ink); }
+.reader-tabs span { font-size:11px; margin-left:3px; }
+/* 미리보기 안내: 로고처럼 크림 종이 띠 + 잉크 글자 */
+.preview-banner { display:flex; flex-wrap:nowrap; align-items:center; justify-content:center; gap:14px; padding:8px 14px; padding-top:max(8px, env(safe-area-inset-top)); background:#f3efe8; color:#1d2128; font-size:12px; white-space:nowrap; overflow-x:auto; scrollbar-width:none; position:relative; z-index:41; box-shadow:0 1px 0 rgb(0 0 0 / .08), 0 6px 14px -8px rgb(0 0 0 / .45); }
+.preview-banner > span { color:#6b6358; display:inline-flex; align-items:center; gap:6px; }
+.preview-banner > span::before { content:""; width:7px; height:11px; background:#9b5a33; clip-path:polygon(0 0,100% 0,100% 100%,50% 76%,0 100%); }
+.preview-banner a,.preview-banner button { text-decoration:underline; text-decoration-color:rgb(29 33 40 / .35); text-underline-offset:3px; min-height:30px; }
+.preview-banner.is-user { background:#e9dcc3; }
+/* 선택된 메뉴: 위에서 늘어뜨린 작은 책갈피 (로고 모양) */
+.nav-ribbon { left:50%; width:9px; height:15px; margin-left:-4.5px; background:var(--color-accent); clip-path:polygon(0 0,100% 0,100% 100%,50% 74%,0 100%); }
+/* 모바일 탭 바: 선반 판처럼 나뭇결 모서리 */
+.tabbar { background:var(--color-paper); box-shadow:0 -10px 24px -18px rgb(0 0 0 / .5); }
+.tabbar::before { content:""; position:absolute; inset:0 0 auto; height:3px; background:linear-gradient(rgb(255 236 210 / .28) 0 1px, transparent 1px, rgb(0 0 0 / .25)), var(--wood-h2), var(--case-board); }
+@media (max-width: 767px) { .creator-grid { grid-template-columns: 1fr; } }
+.creator-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:25px; }
+.creator-grid section { border:1px solid var(--color-rule); padding:28px; }
+.creator-grid h2 { font-size:24px; margin:12px 0; }
+.creator-grid p { font-size:14px; line-height:1.7; color:var(--color-ink-2); }
+.reader-dialog { position:fixed; margin:auto; width:min(520px,calc(100vw - 28px)); max-height:90dvh; overflow-y:auto; background:var(--color-paper); color:var(--color-ink); padding:28px; border:1px solid var(--color-rule); border-radius:8px; box-shadow:0 25px 80px #0003; }
+.reader-dialog::backdrop { background:#1e1a1660; }
+.reader-close { min-width:44px; min-height:44px; }
+.reader-form { display:flex; flex-direction:column; gap:17px; }
+.reader-form label { display:flex; flex-direction:column; gap:7px; font-size:13px; }
+.reader-form input,.reader-form select,.reader-form textarea { width:100%; background:color-mix(in oklab, var(--color-ink) 4%, transparent); color:var(--color-ink); border:1px solid var(--color-rule); padding:11px; min-height:44px; border-radius:3px; font-size:16px; }
+.reader-form input:focus,.reader-form select:focus,.reader-form textarea:focus { outline:1px solid var(--color-ink-2); }
+.reader-form input:disabled { opacity:.4; }
+.reader-error { padding:12px; background:#b2302310; color:#8b3026; font-size:13px; line-height:1.7; }
+@media(max-width:600px) { .creator-grid { grid-template-columns:1fr; } .reader-dialog { padding:22px; } .reader-current { align-items:flex-start; flex-direction:column; } }
+
+/* ── 책상: 책이 놓인 원목 상판 (원근으로 눕히고, 스탠드 불빛이 닿는 곳만 보이게) ── */
+.desk {
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 46% 60% at 50% 38%, rgb(var(--lamp) / calc(var(--lamp-a) * 1.4)), transparent 70%),
+    linear-gradient(rgb(255 236 210 / 0.1), transparent 30%, rgb(0 0 0 / 0.25)),
+    var(--wood-h),
+    var(--case-board);
+  transform: perspective(620px) rotateX(62deg);
+  transform-origin: 50% 100%;
+  -webkit-mask-image: radial-gradient(ellipse 50% 72% at 50% 44%, #000 30%, transparent 70%);
+  mask-image: radial-gradient(ellipse 50% 72% at 50% 44%, #000 30%, transparent 70%);
+  opacity: 0.92;
+}
+html[data-theme="paper"] .desk,
+html:not([data-theme]) .desk {
+  opacity: 0.75;
+}
+
+/* ── 오늘 어디까지 (쪽수 기록) ─────────────────────────────── */
+.quicklog { max-width: 28rem; padding: 16px 16px 12px; border: 1px solid var(--color-rule); border-radius: 6px; background: color-mix(in oklab, var(--color-ink) 3%, transparent); }
+.quicklog.is-night { color: var(--color-night-ink); border-color: rgb(237 228 211 / .18); background: rgb(237 228 211 / .04); text-align: left; }
+.quicklog-title { font-size: 14px; font-weight: 500; }
+.quicklog-left { font-size: 12.5px; color: var(--color-ink-3); white-space: nowrap; }
+.quicklog.is-night .quicklog-left { color: rgb(237 228 211 / .55); }
+.quicklog-delta { color: var(--color-accent); }
+.quicklog-row { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+.quicklog-step { flex: 0 0 44px; height: 44px; border: 1px solid currentColor; border-radius: 50%; font-size: 20px; line-height: 1; opacity: .75; }
+.quicklog-step:hover { opacity: 1; }
+.quicklog-page { flex: 1; min-width: 0; display: flex; align-items: baseline; justify-content: center; gap: 6px; }
+.quicklog-page input { width: 4.2em; min-height: 44px; text-align: center; font-family: var(--font-serif); font-size: 26px; background: transparent; border-bottom: 1.5px solid currentColor; outline: none; -moz-appearance: textfield; }
+.quicklog-page input::-webkit-outer-spin-button, .quicklog-page input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.quicklog-page input:focus { border-color: var(--color-accent); }
+.quicklog-total { font-size: 13px; opacity: .6; white-space: nowrap; }
+.quicklog-save { flex: 0 0 auto; min-height: 44px; padding: 0 16px; border-radius: 4px; background: var(--color-ink); color: var(--color-paper); font-size: 14px; }
+.quicklog.is-night .quicklog-save { background: var(--color-night-ink); color: var(--color-night); }
+.quicklog-save:disabled { opacity: .35; }
+.quicklog-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.quicklog-chips button { min-height: 34px; padding: 0 11px; border: 1px solid color-mix(in oklab, currentColor 30%, transparent); border-radius: 3px; font-size: 12.5px; opacity: .85; }
+.quicklog-chips button:hover { opacity: 1; border-color: currentColor; }
+.quicklog-msg { min-height: 1.4em; margin-top: 8px; font-size: 12.5px; color: var(--color-accent); }
