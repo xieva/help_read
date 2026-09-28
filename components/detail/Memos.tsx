@@ -4,6 +4,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 export type MemoView = {
   id: string;
@@ -14,6 +15,7 @@ export type MemoView = {
 };
 
 export default function Memos({ memos, currentPage }: { memos: MemoView[]; currentPage: number }) {
+  const { gate } = useAuth();
   const [list, setList] = useState(memos);
   const [writing, setWriting] = useState(false);
   const [page, setPage] = useState(String(currentPage || ""));
@@ -77,7 +79,7 @@ export default function Memos({ memos, currentPage }: { memos: MemoView[]; curre
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setWriting(true)}
+            onClick={() => gate(() => setWriting(true))}
             className="press mb-8 inline-flex h-11 items-center gap-2 text-[15px] text-ink-2 hover:text-ink"
           >
             <span className="text-[18px] leading-none text-accent">+</span>

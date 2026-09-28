@@ -1,8 +1,10 @@
+"use client";
 // 버튼 모음
 // PrimaryLink: 가장 중요한 한 가지 행동 (한 화면에 하나만)
 // TextAction: 조용한 글자 버튼
 
 import Link from "next/link";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 type PrimaryProps = {
   href: string;
@@ -10,13 +12,18 @@ type PrimaryProps = {
   sub?: string; // 버튼 안의 작은 보조 설명. 예: "143쪽부터"
   className?: string;
   tone?: "ink" | "night";
+  gated?: boolean; // true 면 로그인한 사람만 이동할 수 있어요 (미리보기에서는 가입 안내)
 };
 
-export function PrimaryLink({ href, children, sub, className = "", tone = "ink" }: PrimaryProps) {
+export function PrimaryLink({ href, children, sub, className = "", tone = "ink", gated = false }: PrimaryProps) {
+  const { gate } = useAuth();
   const colors = tone === "night" ? "bg-night-ink text-night hover:bg-white" : "bg-ink text-paper hover:bg-[#2b251f]";
   return (
     <Link
       href={href}
+      onClick={(e) => {
+        if (gated && !gate()) e.preventDefault();
+      }}
       className={`press group inline-flex h-[54px] shrink-0 items-center justify-between gap-8 rounded-[14px] px-6 whitespace-nowrap text-[15.5px] ${colors} ${className}`}
     >
       <span className="font-medium">{children}</span>

@@ -93,7 +93,7 @@ export default function HomeHero({ book, segments, chapterLabel, returnLine, res
           </div>
 
           <div className="mt-7 flex flex-col gap-3 md:mt-9 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-8 sm:gap-y-3">
-            <PrimaryLink href={`/books/${book.id}/read`} sub={`${book.currentPage}쪽부터`} className="w-full sm:w-auto">
+            <PrimaryLink gated href={`/books/${book.id}/read`} sub={`${book.currentPage}쪽부터`} className="w-full sm:w-auto">
               이어 읽기
             </PrimaryLink>
             <div className="flex items-center justify-center gap-7 sm:justify-start">
@@ -112,7 +112,7 @@ export default function HomeHero({ book, segments, chapterLabel, returnLine, res
           <div className="mt-5">
             <RecallContent recall={recall} />
           </div>
-          <PrimaryLink href={`/books/${book.id}/read`} sub={`${book.currentPage}쪽부터`} className="mt-10 w-full">
+          <PrimaryLink gated href={`/books/${book.id}/read`} sub={`${book.currentPage}쪽부터`} className="mt-10 w-full">
             이제 이어 읽기
           </PrimaryLink>
         </Sheet>

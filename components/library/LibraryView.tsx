@@ -7,10 +7,9 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import type { Book, BookStatus } from "@/data/books";
 import type { Segment } from "@/lib/library";
-import ReadingShelf from "@/components/book/ReadingShelf";
+import BookstoreShelf from "@/components/book/BookstoreShelf";
 import BookCover from "@/components/book/BookCover";
 import BookMorph from "@/components/book/BookMorph";
-import ChapterMap from "@/components/book/ChapterMap";
 
 export type LibraryItem = {
   book: Book;
@@ -69,7 +68,7 @@ export default function LibraryView({ items }: { items: LibraryItem[] }) {
   const view = q ? "search" : filter;
 
   return (
-    <div className="mt-10 md:mt-14">
+    <div className="mt-5 md:mt-12">
       {/* 검색과 필터: 스크롤해도 위에 붙어 있어요 */}
       <div
         className={`sticky top-0 z-30 -mx-[22px] px-[22px] pt-[env(safe-area-inset-top)] transition-[background-color,box-shadow] duration-300 md:-mx-12 md:px-12 ${
@@ -133,98 +132,18 @@ export default function LibraryView({ items }: { items: LibraryItem[] }) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -6 }}
           transition={{ duration: 0.28, ease: [0.2, 0.7, 0.2, 1] }}
-          className="pt-10 pb-10 md:pt-14"
+          className="pt-5 pb-8 md:pt-10"
         >
           {view === "search" && <SearchResults results={results} query={query.trim()} />}
 
-          {view === "all" && (
-            <div className="space-y-20 md:space-y-28">
-              <Group title="펼쳐 둔 책">
-                <ReadingList items={byStatus("reading")} />
-              </Group>
-              <Group title="읽고 싶은 책" note="다음에 펼칠 책들">
-                <Shelf items={byStatus("want")} />
-              </Group>
-              <FinishedByYear items={byStatus("finished")} />
-            </div>
+          {view !== "search" && (
+            // 편집숍 서가: 카테고리별 책장을 좌우로 넘겨요
+            <BookstoreShelf
+              books={(view === "all" ? items : byStatus(view)).map(({ book }) => ({ ...book, href: `/books/${book.id}` }))}
+            />
           )}
-
-          {view === "reading" && <ReadingList items={byStatus("reading")} />}
-          {view === "want" && <Shelf items={byStatus("want")} showReason />}
-          {view === "finished" && <FinishedByYear items={byStatus("finished")} />}
         </motion.div>
       </AnimatePresence>
-    </div>
-  );
-}
-
-function Group({ title, note, children }: { title: string; note?: string; children: React.ReactNode }) {
-  return (
-    <section>
-      <div className="mb-8 flex items-baseline gap-3">
-        <h2 className="font-serif text-[22px] md:text-[26px]">{title}</h2>
-        {note && <p className="text-[13px] text-ink-3">{note}</p>}
-      </div>
-      {children}
-    </section>
-  );
-}
-
-// 읽는 중인 책: 크게, 어디쯤인지와 함께
-function ReadingList({ items }: { items: LibraryItem[] }) {
-  return (
-    <div className="grid gap-12 md:grid-cols-2 md:gap-16">
-      {items.map(({ book, segments, chapterLabel, meta }) => (
-        <Link
-          key={book.id}
-          href={`/books/${book.id}`}
-          className="group grid grid-cols-[92px_1fr] items-end gap-6 md:grid-cols-[124px_1fr] md:gap-8"
-        >
-          <BookMorph id={book.id}>
-            <div className="transition-transform duration-500 ease-[var(--ease-book)] group-hover:-translate-y-1.5">
-              <BookCover book={book} className="book-pages w-full" />
-            </div>
-          </BookMorph>
-          <div className="pb-1">
-            <p className="font-serif text-[22px] leading-snug md:text-[26px]">{book.title}</p>
-            <p className="mt-1 text-[14px] text-ink-3">{book.author}</p>
-            <ChapterMap segments={segments} current={book.currentPage} showLabels={false} className="mt-5" />
-            <p className="mt-3 text-[12.5px] leading-relaxed text-ink-3">
-              <span className="numeral text-ink-2">{book.currentPage}</span> /{" "}
-              <span className="numeral">{book.totalPages}</span>쪽{chapterLabel && ` · ${chapterLabel}`} · {meta}
-            </p>
-          </div>
-        </Link>
-      ))}
-    </div>
-  );
-}
-
-// 같은 서가를 홈과 서재에서 사용합니다.
-function Shelf({ items, showReason = false }: { items: LibraryItem[]; showReason?: boolean }) {
-  return <ReadingShelf books={items.map(({ book }) => book)} showReason={showReason} />;
-}
-
-function FinishedByYear({ items }: { items: LibraryItem[] }) {
-  const years = [...new Set(items.map((i) => i.year))].sort((a, b) => (b ?? 0) - (a ?? 0));
-  return (
-    <div className="space-y-16 md:space-y-24">
-      {years.map((year) => {
-        const list = items.filter((i) => i.year === year);
-        return (
-          <section key={year}>
-            <div className="mb-8 flex items-baseline gap-3">
-              <h2 className="font-serif text-[22px] md:text-[26px]">
-                다 읽은 책 <span className="numeral ml-1 text-ink-3">{year}</span>
-              </h2>
-              <p className="text-[13px] text-ink-3">
-                <span className="numeral">{list.length}</span>권
-              </p>
-            </div>
-            <Shelf items={list} />
-          </section>
-        );
-      })}
     </div>
   );
 }

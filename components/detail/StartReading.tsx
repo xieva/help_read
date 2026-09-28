@@ -3,8 +3,10 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 export default function StartReading({ title }: { title: string }) {
+  const { gate } = useAuth();
   const [started, setStarted] = useState(false);
 
   return (
@@ -24,7 +26,7 @@ export default function StartReading({ title }: { title: string }) {
           <motion.button
             key="start"
             exit={{ opacity: 0, y: -6 }}
-            onClick={() => setStarted(true)}
+            onClick={() => gate(() => setStarted(true))}
             className="press inline-flex h-[54px] w-full items-center justify-center rounded-[14px] bg-ink px-8 text-[15.5px] font-medium text-paper hover:bg-[#2b251f] sm:w-auto"
           >
             읽기 시작하기

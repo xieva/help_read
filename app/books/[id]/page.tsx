@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import Book3D from "@/components/book/Book3D";
+import BookViewer from "@/components/book/BookViewer";
 import BookCover from "@/components/book/BookCover";
 import BookMorph from "@/components/book/BookMorph";
 import ChapterMap from "@/components/book/ChapterMap";
@@ -76,14 +76,14 @@ export default async function BookPage({ params }: { params: Promise<{ id: strin
           <div className="md:grid md:grid-cols-12 md:gap-12 lg:gap-16">
             {/* 왼쪽: 책 */}
             <div className="md:col-span-5">
-              <div className="relative flex h-[330px] items-center justify-center md:sticky md:top-6 md:h-[calc(100svh-120px)] md:max-h-[720px]">
+              <div className="relative flex h-[390px] items-center justify-center md:sticky md:top-6 md:h-[calc(100svh-120px)] md:max-h-[720px]">
                 <div
                   aria-hidden
                   className="lamp pointer-events-none absolute top-1/2 left-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 md:h-[780px] md:w-[780px]"
                 />
                 <BookMorph id={book.id}>
                   <div>
-                    <Book3D book={book} className="[--w:176px] md:[--w:270px] lg:[--w:300px]" />
+                    <BookViewer book={book} className="[--w:164px] md:[--w:190px] lg:[--w:215px]" />
                   </div>
                 </BookMorph>
               </div>
@@ -128,6 +128,7 @@ export default async function BookPage({ params }: { params: Promise<{ id: strin
 
                     <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-8 sm:gap-y-3">
                       <PrimaryLink
+                        gated
                         href={`/books/${book.id}/read`}
                         sub={`${book.currentPage}쪽부터`}
                         className="w-full sm:w-auto"

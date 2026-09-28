@@ -1,10 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { BRAND } from "@/lib/brand";
+import AuthProvider from "@/components/auth/AuthProvider";
 import WorkspaceProvider from "@/components/workspace/WorkspaceProvider";
 import Experience from "@/components/workspace/Experience";
 import Nav from "@/components/Nav";
 import "./globals.css";
+import "./bookstore.css";
 
 // 글꼴: 한글 명조(Noto Serif KR) + 숫자·영문용 Garamond
 // 빌드할 때 글꼴 파일을 내려받지 않고, 브라우저가 필요한 글자만 Google Fonts 에서 가져옵니다.
@@ -37,10 +39,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="stylesheet" href={fontsUrl} />
       </head>
       <body className="min-h-dvh font-sans antialiased">
-        <WorkspaceProvider>
-          <Nav />
-          <main className="relative pb-28 md:pb-0"><Suspense fallback={<div className="wrap py-20">서재 여는 중</div>}><Experience>{children}</Experience></Suspense></main>
-        </WorkspaceProvider>
+        <AuthProvider>
+          <WorkspaceProvider>
+            <Nav />
+            <main className="relative pb-28 md:pb-0">
+              <Suspense fallback={<div className="wrap py-20">서재 여는 중</div>}>
+                <Experience>{children}</Experience>
+              </Suspense>
+            </main>
+          </WorkspaceProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -1,4 +1,6 @@
 "use client";
+// 로그인한 사람의 화면: 오늘 / 서재 / 발견 / 책 상세(/book?id=...)
+// 책은 이 브라우저에 계정별로 저장돼요 (WorkspaceProvider)
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -6,59 +8,287 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { BookStatus } from "@/data/books";
 import { BRAND } from "@/lib/brand";
 import { makeBook, validateInput, type BookInput, type PersonalBook } from "@/lib/user-library";
-import ReadingShelf from "@/components/book/ReadingShelf";
+import { useAuth } from "@/components/auth/AuthProvider";
+import BookCover from "@/components/book/BookCover";
+import BookViewer from "@/components/book/BookViewer";
+import BookstoreShelf, { type ShelfBook } from "@/components/book/BookstoreShelf";
 import DateLine from "@/components/home/DateLine";
 import { useWorkspace } from "./WorkspaceProvider";
 
 const statuses: Record<BookStatus, string> = { reading: "읽는 중", want: "읽고 싶은", finished: "다 읽은" };
-const PAGE_SIZE = 8;
+
+const toShelf = (b: PersonalBook): ShelfBook => ({ ...b, href: `/book?id=${encodeURIComponent(b.id)}` });
+const progress = (b: PersonalBook) => (b.totalPages ? Math.round((b.currentPage / b.totalPages) * 100) : 0);
+
 export default function UserWorkspace({ section }: { section: string }) {
+  const { user } = useAuth();
   const { books, error, saveBooks } = useWorkspace();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<BookStatus | "all">("all");
   const [genre, setGenre] = useState("all");
-  const [page, setPage] = useState(0);
   const [adding, setAdding] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [notice, setNotice] = useState("");
   const params = useSearchParams();
   const router = useRouter();
-  const bookId = params.get("book");
-  const selected = books.find((b) => b.id === bookId);
+
   const home = section === "/";
   const discover = section === "/discover";
+  const detail = section === "/book";
+  // /library?book=<id> 는 예전처럼 바로 편집 창을 열어요
+  const editId = params.get("book");
+  const detailId = params.get("id");
+  const detailBook = detail ? books.find((b) => b.id === detailId) : undefined;
+  const editBook = editing ? detailBook : books.find((b) => b.id === editId);
+
   const search = query.trim().toLocaleLowerCase();
-  const filtered = books.filter((b) => (filter === "all" || b.status === filter) && (genre === "all" || b.genre === genre) && `${b.title} ${b.author}`.toLocaleLowerCase().includes(search));
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const safePage = Math.min(page, totalPages - 1);
-  const visible = filtered.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
-  const current = books.find((b) => b.status === "reading");
-  const openBook = (id: string) => router.push(`/library?book=${encodeURIComponent(id)}`, { scroll: false });
-  const close = () => { setAdding(false); if (bookId) router.replace(section, { scroll: false }); };
+  const filtered = books.filter(
+    (b) =>
+      (filter === "all" || b.status === filter) &&
+      (genre === "all" || b.genre === genre) &&
+      `${b.title} ${b.author}`.toLocaleLowerCase().includes(search),
+  );
+  const reading = books
+    .filter((b) => b.status === "reading")
+    .sort((a, b) => (b.lastReadAt ?? "").localeCompare(a.lastReadAt ?? ""));
+  const current = reading[0];
+
+  const close = () => {
+    setAdding(false);
+    setEditing(false);
+    if (editId) router.replace(section, { scroll: false });
+  };
   const save = (input: BookInput, previous?: PersonalBook) => {
     const book = makeBook(input, previous);
-    const next = previous ? books.map((b) => b.id === previous.id ? book : b) : [book, ...books];
+    const next = previous ? books.map((b) => (b.id === previous.id ? book : b)) : [book, ...books];
     if (!saveBooks(next)) return false;
-    setNotice(previous ? "기록을 저장했어요." : "서재에 추가했어요."); close(); return true;
+    setNotice(previous ? "기록을 저장했어요." : "서재에 추가했어요.");
+    close();
+    return true;
   };
-  const remove = (id: string) => { if (saveBooks(books.filter((b) => b.id !== id))) { setNotice("서재에서 삭제했어요."); close(); } };
+  const remove = (id: string) => {
+    if (saveBooks(books.filter((b) => b.id !== id))) {
+      setNotice("서재에서 삭제했어요.");
+      close();
+      if (detail) router.replace("/library");
+    }
+  };
 
-  return <div className="wrap py-6 md:py-10">
-    <header className="flex items-center justify-between"><Link href="/" className="font-medium tracking-tight">{BRAND.name}</Link><div className="flex items-center gap-5"><DateLine /><Link href="/creator" className="text-xs text-ink-2 underline-offset-4 hover:underline">제작자</Link></div></header>
-    <div className="mt-10 flex flex-wrap items-end justify-between gap-5"><div><p className="eyebrow">{home ? "MY READING" : discover ? "NEXT READ" : "MY LIBRARY"}</p><h1 className="mt-2 text-[32px] font-medium tracking-tight md:text-[42px]">{home ? "오늘의 책" : discover ? "다음 책" : "내 서재"}</h1></div><button className="reader-button" onClick={() => setAdding(true)}>+ 책 추가</button></div>
-    <p role="status" className="mt-4 min-h-5 text-sm text-ink-2">{notice}</p>
-    {error && <p role="alert" className="reader-error">{error}</p>}
-    {bookId && !selected && <p role="alert" className="reader-error">이 브라우저의 서재에 없는 책이에요. <button onClick={close} className="underline">닫기</button></p>}
-    {discover ? <section className="reader-empty"><h2>다음에 읽을 책을 모아두세요.</h2><p>책을 추가할 때 상태를 ‘읽고 싶은’으로 선택하면 됩니다.</p><p className="text-sm">자동 추천은 준비 중이에요.</p><Link href="/library" className="reader-button mt-5">서재 보기</Link></section> : books.length === 0 ? <section className="reader-empty"><div className="empty-volumes" aria-hidden="true"><i /><i /><i /></div><h2>첫 책을 놓아보세요.</h2><p>읽는 책도, 읽고 싶은 책도.</p><button className="reader-button mt-6" onClick={() => setAdding(true)}>첫 책 추가</button></section> : <>
-      {home && current && <section className="reader-current"><div><p className="eyebrow">이어서 기록</p><h2 className="mt-2 text-2xl">{current.title}</h2><p className="mt-2 text-sm text-ink-2">{current.author} · {current.currentPage} / {current.totalPages}쪽</p></div><button className="reader-button secondary" onClick={() => openBook(current.id)}>독서 기록</button></section>}
-      <section className="mt-6" aria-label="내 책 목록"><div className="reader-filters"><label><span className="sr-only">내 책 검색</span><input type="search" value={query} onChange={(e) => { setQuery(e.target.value); setPage(0); }} placeholder="제목, 저자 검색" /></label><label><span className="sr-only">분류</span><select value={genre} onChange={(e) => { setGenre(e.target.value); setPage(0); }}><option value="all">모든 분류</option>{[...new Set(books.map((b) => b.genre))].map((g) => <option key={g}>{g}</option>)}</select></label></div>
-        <div className="reader-tabs" role="group" aria-label="독서 상태 필터"><button aria-pressed={filter === "all"} onClick={() => { setFilter("all"); setPage(0); }}>전체 <span>{books.length}</span></button>{(Object.keys(statuses) as BookStatus[]).map((key) => <button key={key} aria-pressed={filter === key} onClick={() => { setFilter(key); setPage(0); }}>{statuses[key]} <span>{books.filter((b) => b.status === key).length}</span></button>)}</div>
-        {visible.length ? <ReadingShelf key={`${filter}-${genre}-${safePage}-${query}`} books={visible} onOpen={(book) => openBook(book.id)} /> : <div className="py-14 text-center text-sm text-ink-2">{query ? "검색 결과가 없어요." : "이 분류에 책이 없어요."}</div>}
-        <div className="shelf-pagination"><span>{filtered.length}권</span><div><button aria-label="이전 책장" disabled={safePage === 0} onClick={() => setPage(safePage - 1)}>←</button><span aria-live="polite">{safePage + 1} / {totalPages}</span><button aria-label="다음 책장" disabled={safePage + 1 >= totalPages} onClick={() => setPage(safePage + 1)}>→</button></div></div>
-      </section>
-    </>}
-    <footer className="mt-12 border-t border-rule pt-5 text-xs leading-relaxed text-ink-3">책과 기록은 이 브라우저에 저장돼요. 다른 기기와는 아직 동기화되지 않아요.</footer>
-    {(adding || selected) && <BookEditor key={selected?.id ?? "new"} book={selected} defaultStatus={discover ? "want" : "reading"} onClose={close} onSave={save} onDelete={remove} storageError={error} />}
-  </div>;
+  const header = (
+    <header className="flex items-center justify-between md:hidden">
+      <Link href="/" className="font-serif text-[18px] tracking-tight">
+        {BRAND.name}
+      </Link>
+      <DateLine />
+    </header>
+  );
+
+  const editor = (adding || editBook) && (
+    <BookEditor
+      key={editBook?.id ?? "new"}
+      book={editBook}
+      defaultStatus={discover ? "want" : "reading"}
+      onClose={close}
+      onSave={save}
+      onDelete={remove}
+      storageError={error}
+    />
+  );
+
+  // ── 책 상세 ────────────────────────────────────────────────
+  if (detail) {
+    if (!detailBook) {
+      return (
+        <div className="wrap py-20 text-center">
+          <p className="font-serif text-[22px]">이 서재에 없는 책이에요.</p>
+          <Link href="/library" className="reader-button mt-6">
+            서재로
+          </Link>
+        </div>
+      );
+    }
+    const b = detailBook;
+    return (
+      <div className="wrap pt-4 pb-16 md:pt-2">
+        <div className="flex h-12 items-center justify-between">
+          <Link href="/library" className="press text-[14px] text-ink-2">
+            ← 서재
+          </Link>
+          <span className="eyebrow">{statuses[b.status]}</span>
+        </div>
+        <div className="md:grid md:grid-cols-12 md:items-center md:gap-12">
+          <div className="relative flex h-[380px] items-center justify-center overflow-x-clip md:col-span-6 md:h-[560px]">
+            <div aria-hidden className="lamp pointer-events-none absolute top-1/2 left-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2" />
+            <BookViewer book={b} className="[--w:168px] md:[--w:240px]" />
+          </div>
+          <div className="md:col-span-6">
+            <p className="eyebrow">{b.genre}</p>
+            <h1 className="mt-2 font-serif text-[34px] leading-tight font-medium md:text-[48px]">{b.title}</h1>
+            <p className="mt-2 text-[15px] text-ink-2">{b.author}</p>
+            <div className="mt-8 max-w-md">
+              <div className="flex justify-between text-[13px] text-ink-3">
+                <span>
+                  <span className="numeral text-ink-2">{b.currentPage}</span> / <span className="numeral">{b.totalPages}</span>쪽
+                </span>
+                <span className="numeral">{progress(b)}%</span>
+              </div>
+              <div className="mt-2 h-[3px] bg-ink/10">
+                <div className="h-full bg-accent" style={{ width: `${progress(b)}%` }} />
+              </div>
+            </div>
+            {b.note && (
+              <div className="mt-8 max-w-md">
+                <p className="eyebrow">나의 메모</p>
+                <p className="mt-2 font-serif text-[16px] leading-[1.8] whitespace-pre-line text-ink-2">{b.note}</p>
+              </div>
+            )}
+            <p role="status" className="mt-6 min-h-5 text-sm text-ink-2">{notice}</p>
+            <div className="mt-2 flex flex-wrap gap-3">
+              <button className="reader-button press" onClick={() => setEditing(true)}>
+                기록 수정
+              </button>
+              <Link href="/library" className="reader-button secondary press">
+                서재로
+              </Link>
+            </div>
+          </div>
+        </div>
+        {editor}
+      </div>
+    );
+  }
+
+  return (
+    <div className="wrap py-5 md:py-8">
+      {header}
+      <div className={`flex items-end justify-between gap-5 md:mt-2 ${home || discover ? "mt-8" : "mt-4"}`}>
+        <div>
+          <p className="eyebrow">{user ? `${user.name}님의 ${home ? "오늘" : discover ? "다음 책" : "서재"}` : ""}</p>
+          <h1
+            className={`mt-1 font-medium tracking-tight md:mt-2 md:text-[42px] ${home || discover ? "text-[32px]" : "text-[26px]"}`}
+          >
+            {home ? "오늘의 책" : discover ? "다음 책" : "내 서재"}
+          </h1>
+        </div>
+        <button className="reader-button press" onClick={() => setAdding(true)}>
+          + 책 추가
+        </button>
+      </div>
+      <p role="status" className={`text-sm text-ink-2 ${notice ? "mt-3 min-h-5" : "mt-1"}`}>
+        {notice}
+      </p>
+      {error && (
+        <p role="alert" className="reader-error">
+          {error}
+        </p>
+      )}
+      {editId && !editBook && (
+        <p role="alert" className="reader-error">
+          이 브라우저의 서재에 없는 책이에요.{" "}
+          <button onClick={close} className="underline">
+            닫기
+          </button>
+        </p>
+      )}
+
+      {discover ? (
+        <section className="reader-empty">
+          <h2>다음에 읽을 책을 모아두세요.</h2>
+          <p>책을 추가할 때 상태를 ‘읽고 싶은’으로 선택하면 됩니다.</p>
+          <p className="text-sm">자동 추천은 준비 중이에요.</p>
+          <Link href="/library" className="reader-button mt-5">
+            서재 보기
+          </Link>
+        </section>
+      ) : books.length === 0 ? (
+        <section className="reader-empty">
+          <div className="empty-volumes" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+          </div>
+          <h2>첫 책을 놓아보세요.</h2>
+          <p>읽는 책도, 읽고 싶은 책도.</p>
+          <button className="reader-button mt-6" onClick={() => setAdding(true)}>
+            첫 책 추가
+          </button>
+        </section>
+      ) : home ? (
+        <>
+          {current && (
+            <section className="mt-4 grid grid-cols-[112px_1fr] items-center gap-6 md:grid-cols-[150px_1fr] md:gap-10">
+              <Link href={toShelf(current).href} className="press block" aria-label={`${current.title} 펼쳐보기`}>
+                <BookCover book={current} className="book-pages w-full" />
+              </Link>
+              <div>
+                <p className="eyebrow">지금 읽는 책</p>
+                <h2 className="mt-1 font-serif text-[26px] leading-snug md:text-[34px]">{current.title}</h2>
+                <p className="mt-1 text-[14px] text-ink-2">{current.author}</p>
+                <p className="mt-3 text-[13px] text-ink-3">
+                  <span className="numeral text-ink-2">{current.currentPage}</span> /{" "}
+                  <span className="numeral">{current.totalPages}</span>쪽 · <span className="numeral">{progress(current)}</span>%
+                </p>
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <Link href={toShelf(current).href} className="reader-button press">
+                    책 펼쳐보기
+                  </Link>
+                  <Link href={`/library?book=${encodeURIComponent(current.id)}`} className="reader-button secondary press">
+                    기록하기
+                  </Link>
+                </div>
+              </div>
+            </section>
+          )}
+          <section className="mt-14">
+            <div className="mb-4 flex items-baseline justify-between">
+              <h2 className="text-[17px] font-medium">내 책장</h2>
+              <Link href="/library" className="text-[13px] text-ink-2 underline underline-offset-4">
+                전체 보기
+              </Link>
+            </div>
+            <BookstoreShelf books={books.slice(0, 14).map(toShelf)} variant="strip" />
+          </section>
+        </>
+      ) : (
+        <section aria-label="내 책 목록">
+          <div className="reader-filters">
+            <label>
+              <span className="sr-only">내 책 검색</span>
+              <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="제목, 저자 검색" />
+            </label>
+            <label>
+              <span className="sr-only">분류</span>
+              <select value={genre} onChange={(e) => setGenre(e.target.value)}>
+                <option value="all">모든 분류</option>
+                {[...new Set(books.map((b) => b.genre))].map((g) => (
+                  <option key={g}>{g}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="reader-tabs" role="group" aria-label="독서 상태 필터">
+            <button aria-pressed={filter === "all"} onClick={() => setFilter("all")}>
+              전체 <span>{books.length}</span>
+            </button>
+            {(Object.keys(statuses) as BookStatus[]).map((key) => (
+              <button key={key} aria-pressed={filter === key} onClick={() => setFilter(key)}>
+                {statuses[key]} <span>{books.filter((b) => b.status === key).length}</span>
+              </button>
+            ))}
+          </div>
+          {filtered.length ? (
+            <BookstoreShelf books={filtered.map(toShelf)} onAdd={() => setAdding(true)} />
+          ) : (
+            <div className="py-14 text-center text-sm text-ink-2">{query ? "검색 결과가 없어요." : "이 분류에 책이 없어요."}</div>
+          )}
+        </section>
+      )}
+      <footer className="mt-12 border-t border-rule pt-5 text-xs leading-relaxed text-ink-3">
+        책과 기록은 이 브라우저에 저장돼요. 다른 기기와는 아직 동기화되지 않아요.
+      </footer>
+      {editor}
+    </div>
+  );
 }
 
 function BookEditor({ book, defaultStatus, onClose, onSave, onDelete, storageError }: { book?: PersonalBook; defaultStatus: BookStatus; onClose: () => void; onSave: (input: BookInput, previous?: PersonalBook) => boolean; onDelete: (id: string) => void; storageError: string }) {

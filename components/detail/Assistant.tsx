@@ -7,6 +7,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import type { Assistant } from "@/data/reading";
 import { Arrow } from "@/components/ui/Buttons";
 import Sheet from "@/components/ui/Sheet";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 type Message = { id: number; question: string; answer: string[] | null };
 
@@ -42,7 +43,9 @@ export function AssistantProvider({ assistant, bookTitle, tint, children }: Prov
     }, 1100);
   };
 
+  const { gate } = useAuth();
   const ask = (index?: number) => {
+    if (!gate()) return;
     setOpen(true);
     if (index === undefined) return;
     const qa = assistant.suggestions[index];

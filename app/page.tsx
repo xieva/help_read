@@ -6,7 +6,7 @@ import { BRAND } from "@/lib/brand";
 import Link from "next/link";
 import BookCover from "@/components/book/BookCover";
 import BookMorph from "@/components/book/BookMorph";
-import ReadingShelf from "@/components/book/ReadingShelf";
+import BookstoreShelf from "@/components/book/BookstoreShelf";
 import ChapterMap from "@/components/book/ChapterMap";
 import HomeHero from "@/components/home/HomeHero";
 import { Arrow } from "@/components/ui/Buttons";
@@ -140,7 +140,7 @@ export default function HomePage() {
         <Section label="최근 다 읽은 책" aside={finishedThisYear > 0 ? `올해 ${finishedThisYear}권` : undefined}>
           <div className="md:grid md:grid-cols-9 md:items-end md:gap-12">
             <div className="md:col-span-5">
-              <ReadingShelf books={finished.slice(0, 8)} />
+              <BookstoreShelf variant="strip" books={finished.slice(0, 8).map((b) => ({ ...b, href: `/books/${b.id}` }))} />
             </div>
 
             {quoted && (

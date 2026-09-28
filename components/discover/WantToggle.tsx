@@ -3,13 +3,15 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 export default function WantToggle() {
+  const { gate } = useAuth();
   const [saved, setSaved] = useState(false);
   return (
     <button
       type="button"
-      onClick={() => setSaved((s) => !s)}
+      onClick={() => gate(() => setSaved((s) => !s))}
       aria-pressed={saved}
       className={`press relative inline-flex h-10 items-center gap-2 text-[14px] transition-colors ${
         saved ? "text-accent" : "text-ink-2 hover:text-ink"

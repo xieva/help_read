@@ -1,6 +1,9 @@
 import type { Book, BookStatus } from "@/data/books";
+import { uid } from "./uid";
 
 export const LIBRARY_KEY = "reader.user-library.v1";
+// 계정마다 서재를 따로 저장해요. (로그인 기능 전의 기록은 LIBRARY_KEY 에 남아 있어요)
+export const libraryKey = (userId: string) => `${LIBRARY_KEY}:${userId}`;
 export type PersonalBook = Book & { note: string };
 export type BookInput = { title: string; author: string; genre: string; totalPages: number; currentPage: number; status: BookStatus; note: string };
 
@@ -19,7 +22,7 @@ export function makeBook(input: BookInput, previous?: PersonalBook): PersonalBoo
   const colors = ["#46544c", "#75615c", "#374758", "#a29379", "#756e84"];
   const color = colors[Array.from(input.title).reduce((n, c) => n + c.charCodeAt(0), 0) % colors.length];
   return {
-    ...previous, ...input, id: previous?.id ?? `personal-${crypto.randomUUID()}`,
+    ...previous, ...input, id: previous?.id ?? uid("personal-"),
     title: input.title.trim(), author: input.author.trim(), genre: input.genre.trim() || "미분류",
     publisher: previous?.publisher ?? "", year: previous?.year ?? new Date().getFullYear(),
     addedAt: previous?.addedAt ?? now, lastReadAt: input.status === "reading" ? now : previous?.lastReadAt,
