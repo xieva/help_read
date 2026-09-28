@@ -68,7 +68,7 @@ export default function ReadingShelf({ books, showReason = false, onOpen }: { bo
                 }}>
                 <span className="shelf-object" aria-hidden="true">
                   <span className="shelf-back" />
-                  <span className="shelf-spine"><span className="shelf-spine-rule" /><span className="shelf-spine-title">{book.title}</span><span className="shelf-spine-author">{book.author.split(",")[0]}</span></span>
+                  <span className="shelf-spine"><span className="shelf-spine-rule" /><span className="shelf-spine-title" style={{ fontSize: `${spineFont(book.title)}px` }}>{spineTitle(book.title)}</span><span className="shelf-spine-author">{book.author.split(",")[0]}</span></span>
                   <span className="shelf-pages" />
                   <span className="shelf-front"><BookCover book={book} className="h-full w-full" /></span>
                 </span>
@@ -97,4 +97,13 @@ export default function ReadingShelf({ books, showReason = false, onOpen }: { bo
       </div>
     </div>
   );
+}
+
+// 책등 제목이 잘리지 않도록, 글자 수에 맞춰 크기를 줄여요 (너무 길면 끝을 …로)
+function spineFont(title: string) {
+  return Math.min(12, Math.max(8, 104 / Array.from(title).length));
+}
+function spineTitle(title: string) {
+  const chars = Array.from(title);
+  return chars.length > 13 ? chars.slice(0, 12).join("") + "…" : title;
 }
